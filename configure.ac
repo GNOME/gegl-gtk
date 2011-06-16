@@ -103,6 +103,12 @@ AC_SUBST(GTK3_REQUIRED_VERSION)
 PACKAGE_NAME=gegl-gtk
 AC_SUBST(PACKAGE_NAME)
 
+GEGL_PLUGINS_DIR=`pkg-config gegl --variable=pluginsdir`
+if test -z $GEGL_PLUGINS_DIR; then
+	AC_MSG_ERROR(
+        [no pluginsdir set in GEGL pkg-config file])
+fi
+AC_SUBST(GEGL_PLUGINS_DIR)
 
 dnl ==========================================================================
 
@@ -256,6 +262,7 @@ fi
 AC_OUTPUT([
 Makefile
 gegl-gtk/Makefile
+operations/Makefile
 examples/Makefile
 gegl-gtk-2.0.pc
 gegl-gtk-3.0.pc
