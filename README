@@ -1,0 +1,21 @@
+License: GPLv3
+
+== TODO ==
+General
+* Add GObject introspection support
+* Write a Gegl based GdkPixbuf loader plugin
+
+GeglView
+* Write tests
+* Write benchmark
+* Add API for getting model->view transformation matrix
+* Add rotation support
+* Add signals for drawing widget background and overlay
+* Add property to change scaling/cropping/streching behavior
+
+gtk-display
+* Use GeglView instead of custom widget
+
+examples
+* Add a super basic example (10 liner)
+* Add a way to manipulate view transformation to paint example
