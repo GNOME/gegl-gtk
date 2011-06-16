@@ -2,7 +2,6 @@ License: Library is LGPLv3+, examples GPLv3+
 
 == TODO ==
 General
-* Add GObject introspection support
 * Write a Gegl based GdkPixbuf loader plugin
 
 GeglView
@@ -17,5 +16,8 @@ gtk-display
 * Use GeglView instead of custom widget
 
 examples
-* Add a super basic example (10 liner)
 * Add a way to manipulate view transformation to paint example
+
+== BUGS ==
+* On first redraw of GeglGtkView, there is sometimes a segfault inside babl:
+babl-fish-reference.c:290 process_same_model()
