@@ -16,7 +16,7 @@ AM_CPPFLAGS = \
 AM_CFLAGS = $(GEGL_CFLAGS) $(GTK_CFLAGS)
 
 AM_LDFLAGS =  \
-	$(top_builddir)/gegl-gtk/libgegl-gtk-@GEGL_GTK_API_VERSION@.la \
+	$(top_builddir)/gegl-gtk/libgegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.la \
 	$(GEGL_LIBS) $(GTK_LIBS)
 
 all-local: $(bins)
