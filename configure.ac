@@ -274,6 +274,7 @@ Makefile
 gegl-gtk/Makefile
 operations/Makefile
 examples/Makefile
+tests/Makefile
 gegl-gtk2-0.1.pc
 gegl-gtk3-0.1.pc
 ])

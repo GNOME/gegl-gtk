@@ -5,7 +5,8 @@ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 SUBDIRS=\
 	gegl-gtk \
 	operations \
-	examples
+	examples \
+	tests
 
 pkgconfigdir = $(libdir)/pkgconfig
 
