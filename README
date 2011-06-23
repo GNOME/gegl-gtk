@@ -1,7 +1,8 @@
-License: GPLv3
+License: LGPLv3
 
 == TODO ==
 General
+* Rename library from gegl-gtk-{2,3}.0 to gegl-gtk{2,3}-0.1
 * Add GObject introspection support
 * Write a Gegl based GdkPixbuf loader plugin
 
