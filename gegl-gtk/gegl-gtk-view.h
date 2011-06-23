@@ -16,34 +16,34 @@
  * Copyright (C) 2003, 2004, 2006 Øyvind Kolås
  */
 
-#ifndef __GEGL_VIEW_H__
-#define __GEGL_VIEW_H__
+#ifndef __GEGL_GTK_VIEW_H__
+#define __GEGL_GTK_VIEW_H__
 
 G_BEGIN_DECLS
 
-#define GEGL_TYPE_VIEW            (gegl_view_get_type ())
-#define GEGL_VIEW(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEGL_TYPE_VIEW, GeglView))
-#define GEGL_VIEW_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass),  GEGL_TYPE_VIEW, GeglViewClass))
-#define GEGL_IS_VIEW(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEGL_TYPE_VIEW))
-#define GEGL_IS_VIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),  GEGL_TYPE_VIEW))
-#define GEGL_VIEW_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),  GEGL_TYPE_VIEW, GeglViewClass))
+#define GEGL_GTK_TYPE_VIEW            (gegl_gtk_view_get_type ())
+#define GEGL_GTK_VIEW(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), GEGL_GTK_TYPE_VIEW, GeglGtkView))
+#define GEGL_GTK_VIEW_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass),  GEGL_GTK_TYPE_VIEW, GeglGtkViewClass))
+#define GEGL_GTK_IS_VIEW(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GEGL_GTK_TYPE_VIEW))
+#define GEGL_GTK_IS_VIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass),  GEGL_GTK_TYPE_VIEW))
+#define GEGL_GTK_VIEW_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj),  GEGL_GTK_TYPE_VIEW, GeglGtkViewClass))
 
-typedef struct _GeglView        GeglView;
-typedef struct _GeglViewClass   GeglViewClass;
+typedef struct _GeglGtkView        GeglGtkView;
+typedef struct _GeglGtkViewClass   GeglGtkViewClass;
 
-struct _GeglView
+struct _GeglGtkView
 {
   GtkDrawingArea parent_instance;
 
 };
 
-struct _GeglViewClass
+struct _GeglGtkViewClass
 {
   GtkDrawingAreaClass parent_class;
 };
 
-GType           gegl_view_get_type      (void) G_GNUC_CONST;
+GType           gegl_gtk_view_get_type      (void) G_GNUC_CONST;
 
 G_END_DECLS
 
-#endif /* __GEGL_VIEW_H__ */
+#endif /* __GEGL_GTK_VIEW_H__ */

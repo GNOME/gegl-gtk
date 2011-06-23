@@ -37,7 +37,7 @@ enum
 };
 
 
-typedef struct _GeglViewPrivate
+typedef struct _GeglGtkViewPrivate
 {
   GeglNode      *node;
   gint           x;
@@ -47,15 +47,15 @@ typedef struct _GeglViewPrivate
 
   guint          monitor_id;
   GeglProcessor *processor;
-} GeglViewPrivate;
+} GeglGtkViewPrivate;
 
 
-G_DEFINE_TYPE (GeglView, gegl_view, GTK_TYPE_DRAWING_AREA)
-#define GEGL_VIEW_GET_PRIVATE(obj) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), GEGL_TYPE_VIEW, GeglViewPrivate))
+G_DEFINE_TYPE (GeglGtkView, gegl_gtk_view, GTK_TYPE_DRAWING_AREA)
+#define GEGL_GTK_VIEW_GET_PRIVATE(obj) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), GEGL_GTK_TYPE_VIEW, GeglGtkViewPrivate))
 
-static void      gegl_view_class_init (GeglViewClass  *klass);
-static void      gegl_view_init       (GeglView       *self);
+static void      gegl_gtk_view_class_init (GeglGtkViewClass  *klass);
+static void      gegl_gtk_view_init       (GeglGtkView       *self);
 static void      finalize             (GObject        *gobject);
 static void      set_property         (GObject        *gobject,
                                        guint           prop_id,
@@ -74,10 +74,10 @@ static gboolean  draw                 (GtkWidget * widget,
                                        cairo_t *cr);
 #endif
 
-static void      gegl_view_repaint       (GeglView *view);
+static void      gegl_gtk_view_repaint       (GeglGtkView *view);
 
 static void
-gegl_view_class_init (GeglViewClass * klass)
+gegl_gtk_view_class_init (GeglGtkViewClass * klass)
 {
   GObjectClass   *gobject_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class  = GTK_WIDGET_CLASS (klass);
@@ -130,13 +130,13 @@ gegl_view_class_init (GeglViewClass * klass)
                                                         G_PARAM_READWRITE));
 
 
-   g_type_class_add_private (klass, sizeof (GeglViewPrivate));
+   g_type_class_add_private (klass, sizeof (GeglGtkViewPrivate));
 }
 
 static void
-gegl_view_init (GeglView *self)
+gegl_gtk_view_init (GeglGtkView *self)
 {
-  GeglViewPrivate *priv = GEGL_VIEW_GET_PRIVATE (self);
+  GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (self);
   priv->node        = NULL;
   priv->x           = 0;
   priv->y           = 0;
@@ -148,8 +148,8 @@ gegl_view_init (GeglView *self)
 static void
 finalize (GObject *gobject)
 {
-  GeglView * self = GEGL_VIEW (gobject);
-  GeglViewPrivate *priv = GEGL_VIEW_GET_PRIVATE (self);
+  GeglGtkView * self = GEGL_GTK_VIEW (gobject);
+  GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (self);
 
   if (priv->monitor_id)
     {  
@@ -163,15 +163,15 @@ finalize (GObject *gobject)
   if (priv->processor)
     g_object_unref (priv->processor);
 
-  G_OBJECT_CLASS (gegl_view_parent_class)->finalize (gobject);
+  G_OBJECT_CLASS (gegl_gtk_view_parent_class)->finalize (gobject);
 }
 
 static void
 computed_event (GeglNode      *self,
                 GeglRectangle *rect,
-                GeglView      *view)
+                GeglGtkView      *view)
 {
-  GeglViewPrivate *priv = GEGL_VIEW_GET_PRIVATE (view);
+  GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (view);
   gint x = priv->scale * (rect->x) - priv->x;
   gint y = priv->scale * (rect->y) - priv->y;
   gint w = ceil (priv->scale * rect->width  + 1);
@@ -184,9 +184,9 @@ computed_event (GeglNode      *self,
 static void
 invalidated_event (GeglNode      *self,
                    GeglRectangle *rect,
-                   GeglView      *view)
+                   GeglGtkView      *view)
 {
-  gegl_view_repaint (view);
+  gegl_gtk_view_repaint (view);
 }
 
 static void
@@ -195,8 +195,8 @@ set_property (GObject      *gobject,
               const GValue *value,
               GParamSpec   *pspec)
 {
-  GeglView *self = GEGL_VIEW (gobject);
-  GeglViewPrivate *priv = GEGL_VIEW_GET_PRIVATE (self);
+  GeglGtkView *self = GEGL_GTK_VIEW (gobject);
+  GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (self);
 
   switch (property_id)
     {
@@ -216,7 +216,7 @@ set_property (GObject      *gobject,
           g_signal_connect_object (priv->node, "invalidated",
                                    G_CALLBACK (invalidated_event),
                                    self, 0);
-          gegl_view_repaint (self);
+          gegl_gtk_view_repaint (self);
         }
       else
         {
@@ -251,8 +251,8 @@ get_property (GObject      *gobject,
               GValue       *value,
               GParamSpec   *pspec)
 {
-  GeglView *self = GEGL_VIEW (gobject);
-  GeglViewPrivate *priv = GEGL_VIEW_GET_PRIVATE (self);
+  GeglGtkView *self = GEGL_GTK_VIEW (gobject);
+  GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (self);
 
   switch (property_id)
     {
@@ -278,7 +278,7 @@ get_property (GObject      *gobject,
 }
 
 static void
-draw_implementation (GeglViewPrivate *priv, cairo_t *cr, GdkRectangle *rect)
+draw_implementation (GeglGtkViewPrivate *priv, cairo_t *cr, GdkRectangle *rect)
 {
   cairo_surface_t *surface = NULL;
   guchar          *buf = NULL;
@@ -322,8 +322,8 @@ draw_implementation (GeglViewPrivate *priv, cairo_t *cr, GdkRectangle *rect)
 static gboolean
 draw (GtkWidget * widget, cairo_t *cr)
 {
-  GeglView      *view = GEGL_VIEW (widget);
-  GeglViewPrivate *priv = GEGL_VIEW_GET_PRIVATE (view);
+  GeglGtkView      *view = GEGL_GTK_VIEW (widget);
+  GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (view);
   GdkRectangle rect;
 
   if (!priv->node)
@@ -333,7 +333,7 @@ draw (GtkWidget * widget, cairo_t *cr)
 
   draw_implementation (priv, cr, &rect);
 
-  gegl_view_repaint (view);
+  gegl_gtk_view_repaint (view);
 
   return FALSE;
 }
@@ -344,8 +344,8 @@ static gboolean
 expose_event (GtkWidget      *widget,
               GdkEventExpose *event)
 {
-  GeglView      *view = GEGL_VIEW (widget);
-  GeglViewPrivate *priv = GEGL_VIEW_GET_PRIVATE (view);
+  GeglGtkView      *view = GEGL_GTK_VIEW (widget);
+  GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (view);
   cairo_t      *cr;
   GdkRectangle rect;
 
@@ -360,16 +360,16 @@ expose_event (GtkWidget      *widget,
   draw_implementation (priv, cr, &rect);
   cairo_destroy (cr);
 
-  gegl_view_repaint (view);
+  gegl_gtk_view_repaint (view);
 
   return FALSE;
 }
 #endif
 
 static gboolean
-task_monitor (GeglView *view)
+task_monitor (GeglGtkView *view)
 {
-  GeglViewPrivate *priv = GEGL_VIEW_GET_PRIVATE (view);
+  GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (view);
   if (priv->processor==NULL)
     return FALSE;
   if (gegl_processor_work (priv->processor, NULL))
@@ -381,10 +381,10 @@ task_monitor (GeglView *view)
 }
 
 void
-gegl_view_repaint (GeglView *view)
+gegl_gtk_view_repaint (GeglGtkView *view)
 {
   GtkWidget       *widget = GTK_WIDGET (view);
-  GeglViewPrivate *priv   = GEGL_VIEW_GET_PRIVATE (view);
+  GeglGtkViewPrivate *priv   = GEGL_GTK_VIEW_GET_PRIVATE (view);
   GeglRectangle    roi;
   GtkAllocation    allocation;
 
