@@ -10,16 +10,16 @@ SUBDIRS=\
 pkgconfigdir = $(libdir)/pkgconfig
 
 if HAVE_GTK2
-pkgconfig_DATA = gegl-gtk-2.0.pc
+pkgconfig_DATA = gegl-gtk2-0.1.pc
 else
-pkgconfig_DATA = gegl-gtk-3.0.pc
+pkgconfig_DATA = gegl-gtk3-0.1.pc
 endif
 
 EXTRA_DIST = \
 	$(built_dist_files) \
 	autogen.sh \
-	gegl-gtk-2.0.pc.in \
-	gegl-gtk-3.0.pc.in \
+	gegl-gtk2-0.1.pc.in \
+	gegl-gtk3-0.1.pc.in \
 	m4/introspection.m4
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-introspection

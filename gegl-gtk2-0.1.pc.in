@@ -7,5 +7,5 @@ Name: GEGL-GTK
 Description: GTK+ UI convenience library for GEGL
 Version: @GEGL_GTK_REAL_VERSION@
 Requires: gtk+-2.0 gegl babl
-Libs: -L${libdir} -l@PACKAGE_NAME@-@GEGL_GTK_API_VERSION@
-Cflags: -I${includedir}/@PACKAGE_NAME@-@GEGL_GTK_API_VERSION@
+Libs: -L${libdir} -l@PACKAGE_NAME@2-@GEGL_GTK_API_VERSION@
+Cflags: -I${includedir}/@PACKAGE_NAME@2-@GEGL_GTK_API_VERSION@

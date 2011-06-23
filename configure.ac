@@ -12,8 +12,9 @@ dnl if backwards compatibility has been broken,
 dnl    set GEGL_GTK_BINARY_AGE _and_ GEGL_GTK_INTERFACE_AGE to 0.
 
 m4_define([gegl_gtk_major_version], [0])
-m4_define([gegl_gtk_minor_version], [1])
-m4_define([gegl_gtk_micro_version], [0])
+m4_define([gegl_gtk_minor_version], [0])
+m4_define([gegl_gtk_micro_version], [1])
+m4_define([gegl_gtk_api_version], [0.1])
 
 m4_define([gegl_gtk_real_version],
           [gegl_gtk_major_version.gegl_gtk_minor_version.gegl_gtk_micro_version])
@@ -64,6 +65,7 @@ GEGL_GTK_BINARY_AGE=gegl_gtk_binary_age
 GEGL_GTK_VERSION=gegl_gtk_version
 GEGL_GTK_REAL_VERSION=gegl_gtk_real_version
 GEGL_GTK_VERSION=gegl_gtk_version
+GEGL_GTK_API_VERSION=gegl_gtk_api_version
 
 AC_SUBST(GEGL_GTK_MAJOR_VERSION)
 AC_SUBST(GEGL_GTK_MINOR_VERSION)
@@ -72,6 +74,7 @@ AC_SUBST(GEGL_GTK_INTERFACE_AGE)
 AC_SUBST(GEGL_GTK_BINARY_AGE)
 AC_SUBST(GEGL_GTK_VERSION)
 AC_SUBST(GEGL_GTK_REAL_VERSION)
+AC_SUBST(GEGL_GTK_API_VERSION)
 
 dnl The symbol GEGL_GTK_UNSTABLE is defined above for substitution in
 dnl Makefiles and conditionally defined here as a preprocessor symbol
@@ -205,21 +208,20 @@ AC_ARG_WITH([gtk],
 	AC_MSG_RESULT([$with_gtk])
 
 have_gtk="no"
-gegl_gtk_api_version=""
 case "$with_gtk" in
 	2.0) PKG_CHECK_MODULES(GTK, gtk+-2.0 >= gtk2_required_version,
-		[have_gtk="2.0" GEGL_GTK_API_VERSION="2.0"
+		[have_gtk="2.0" GEGL_GTK_GTK_VERSION="2"
 		AC_DEFINE(HAVE_GTK2, 1, [Define to 1 to compile for gtk2])],
 		[]) ;;
 
 	3.0) PKG_CHECK_MODULES(GTK, gtk+-3.0 >= gtk3_required_version,
-		[have_gtk="3.0" GEGL_GTK_API_VERSION="3.0"
+		[have_gtk="3.0" GEGL_GTK_GTK_VERSION="3"
 		AC_DEFINE(HAVE_GTK2, 1, [Define to 1 to compile for gtk2])],
 		[]) ;;
 	*) ;;
 esac
-#GEGL_GTK_API_VERSION=gegl_gtk_api_version
-AC_SUBST(GEGL_GTK_API_VERSION)
+
+AC_SUBST(GEGL_GTK_GTK_VERSION)
 
 AM_CONDITIONAL(HAVE_GTK2, test "$have_gtk" = "2.0")
 AM_CONDITIONAL(HAVE_GTK3, test "$have_gtk" = "3.0")
@@ -264,8 +266,8 @@ Makefile
 gegl-gtk/Makefile
 operations/Makefile
 examples/Makefile
-gegl-gtk-2.0.pc
-gegl-gtk-3.0.pc
+gegl-gtk2-0.1.pc
+gegl-gtk3-0.1.pc
 ])
 
 dnl Print a summary of features enabled/disabled:
