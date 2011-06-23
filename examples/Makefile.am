@@ -11,7 +11,7 @@ gegl_lt_ccld_v_ = $(gegl_lt_ccld_v_$(AM_DEFAULT_VERBOSITY))
 gegl_lt_ccld_v_0 = @echo "  CCLD   " $@;
 
 AM_CPPFLAGS = \
-	-I$(top_builddir)/gegl-gtk
+	-I$(top_srcdir)/gegl-gtk
 
 AM_CFLAGS = $(GEGL_CFLAGS) $(GTK_CFLAGS)
 
