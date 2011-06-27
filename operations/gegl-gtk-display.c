@@ -229,7 +229,11 @@ gegl_chant_class_init (GeglChantClass *klass)
   sink_class->process = process;
   G_OBJECT_CLASS (klass)->dispose = dispose;
 
-  operation_class->name        = "gegl:gtk-display";
+#ifdef HAVE_GTK2
+  operation_class->name        = "gegl-gtk2:display";
+#else
+  operation_class->name        = "gegl-gtk3:display";
+#endif
   operation_class->categories  = "output";
   operation_class->description =
         _("Displays the input buffer in an GTK window .");
