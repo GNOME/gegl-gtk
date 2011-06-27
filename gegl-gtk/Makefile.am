@@ -9,7 +9,7 @@ gegl_gtk_include_HEADERS = $(headers)
 
 gegl_gtk_SOURCES = $(headers) $(sources)
 gegl_gtk_LIBADD  = $(GTK_LIBS) $(GEGL_LIBS)
-gegl_gtk_CFLAGS  = $(INCLUDES)
+gegl_gtk_CFLAGS  = $(INCLUDES) $(CFLAGS)
 
 if HAVE_GTK2
 lib_LTLIBRARIES = libgegl-gtk2-0.1.la

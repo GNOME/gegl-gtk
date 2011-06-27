@@ -32,75 +32,22 @@ gegl_chant_string  (window_title, _("Window Title"), "",
 
 #include <gegl.h>
 #include <gegl-chant.h>
+
 #include <gtk/gtk.h>
+#include <gegl-gtk.h>
 
 typedef struct
 {
   GtkWidget *window;
-  GtkWidget *drawing_area;
+  GtkWidget *view_widget;
+  GeglNode  *node;
+  GeglNode  *input;
   gint       width;
   gint       height;
-  guchar    *buf;
 } Priv;
 
-
-static void
-draw_implementation (Priv *priv, cairo_t *cr)
-{
-  cairo_surface_t *surface = NULL;
-
-  if (!priv->buf)
-    return;
-
-  surface = cairo_image_surface_create_for_data (priv->buf,
-                                                 CAIRO_FORMAT_ARGB32,
-                                                 priv->width, priv->height,
-                                                 priv->width*4);
-
-  cairo_set_source_surface (cr, surface, 0.0, 0.0);
-  cairo_paint (cr);
-
-  cairo_surface_finish (surface);
-}
-
-#ifdef HAVE_GTK2
-static gboolean
-expose_event (GtkWidget *widget, GdkEventExpose * event, gpointer user_data)
-{
-  GeglChantO *o = GEGL_CHANT_PROPERTIES (g_object_get_data (G_OBJECT (widget), "op"));
-  Priv       *priv = (Priv*)o->chant_data;
-  cairo_t *cr = gdk_cairo_create (widget->window);
-
-  if (event->area.x + event->area.width > priv->width)
-    event->area.width = priv->width - event->area.x;
-  if (event->area.y + event->area.height > priv->height)
-    event->area.height = priv->height - event->area.y;
-
-  cairo_rectangle (cr, event->area.x, event->area.y,
-                   event->area.width, event->area.height);
-  cairo_clip (cr);
-
-  draw_implementation (priv, cr);
-  cairo_destroy (cr);
-
-  return TRUE;
-}
-#endif
-
-#ifdef HAVE_GTK3
-static gboolean
-draw (GtkWidget * widget, cairo_t *cr, gpointer user_data)
-{
-  GeglChantO *o = GEGL_CHANT_PROPERTIES (g_object_get_data (G_OBJECT (widget), "op"));
-  Priv       *priv = (Priv*)o->chant_data;
-
-  draw_implementation (priv, cr);
-
-  return TRUE;
-}
-#endif
-
-static Priv *init_priv (GeglOperation *operation)
+static Priv *
+init_priv (GeglOperation *operation)
 {
   GeglChantO *o = GEGL_CHANT_PROPERTIES (operation);
 
@@ -112,90 +59,69 @@ static Priv *init_priv (GeglOperation *operation)
       gtk_init (0, 0);
 
       priv->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-      priv->drawing_area = gtk_drawing_area_new ();
-      gtk_container_add (GTK_CONTAINER (priv->window), priv->drawing_area);
+      priv->view_widget = g_object_new (GEGL_GTK_TYPE_VIEW, NULL);
+      gtk_container_add (GTK_CONTAINER (priv->window), priv->view_widget);
       priv->width = -1;
       priv->height = -1;
-      gtk_widget_set_size_request (priv->drawing_area, priv->width, priv->height);
+      gtk_widget_set_size_request (priv->view_widget, priv->width, priv->height);
       gtk_window_set_title (GTK_WINDOW (priv->window), o->window_title);
 
-#ifdef HAVE_GTK2
-      g_signal_connect (G_OBJECT (priv->drawing_area), "expose_event",
-                        G_CALLBACK (expose_event), priv);
-#endif
-
-#ifdef HAVE_GTK3
-      g_signal_connect (G_OBJECT (priv->drawing_area), "draw",
-                        G_CALLBACK (draw), priv);
-#endif
-
-      g_object_set_data (G_OBJECT (priv->drawing_area), "op", operation);
+      priv->node = NULL;
+      priv->input = NULL;
 
       gtk_widget_show_all (priv->window);
-
-      priv->buf = NULL;
     }
   return (Priv*)(o->chant_data);
 }
 
-static gboolean
-process (GeglOperation       *operation,
-         GeglBuffer          *input,
-         const GeglRectangle *result)
+static void
+set_window_attributes (GeglOperation *operation, const GeglRectangle *result)
 {
   GeglChantO *o = GEGL_CHANT_PROPERTIES (operation);
   Priv       *priv = init_priv (operation);
-  GeglBuffer *source = NULL;
-  Babl       *format = NULL;
-
-  g_assert (input);
 
   if (priv->width != result->width  ||
       priv->height != result->height)
     {
       priv->width = result->width ;
       priv->height = result->height;
-      gtk_widget_set_size_request (priv->drawing_area, priv->width, priv->height);
-
-      if (priv->buf)
-        g_free (priv->buf);
-      priv->buf = g_malloc (priv->width * priv->height * 4);
+      gtk_widget_set_size_request (priv->view_widget, priv->width, priv->height);
     }
-
-  source = gegl_buffer_create_sub_buffer (input, result);
-
-  format = babl_format_new (babl_model ("RGBA"), babl_type ("u8"),
-                            babl_component ("B"),
-                            babl_component ("G"),
-                            babl_component ("R"),
-                            babl_component ("A"),
-                            NULL);
-  gegl_buffer_get (source, 1.0, NULL, format,
-                   priv->buf, GEGL_AUTO_ROWSTRIDE);
-  gtk_widget_queue_draw (priv->drawing_area);
+  
 
   if (priv->window)
     {
       gtk_window_resize (GTK_WINDOW (priv->window), priv->width, priv->height);
-      if (o->window_title[0]!='\0')
+      if (o->window_title && o->window_title[0]!='\0')
         {
           gtk_window_set_title (GTK_WINDOW (priv->window), o->window_title);
         }
       else
         {
           gtk_window_set_title (GTK_WINDOW (priv->window),
-           gegl_node_get_debug_name (gegl_node_get_producer(operation->node, "input", NULL))
-           );
+          gegl_node_get_debug_name (gegl_node_get_producer(operation->node, "input", NULL))
+          );
         }
+  }
+}
 
-      while (gtk_events_pending ())
-        {
-          gtk_main_iteration ();
-        }
-    }
-  g_object_unref (source);
+/* Create an input proxy, and initial display operation, and link together.
+ * These will be passed control when process is called later. */
+static void
+attach (GeglOperation *operation)
+{
+  Priv       *priv = init_priv (operation);
 
-  return  TRUE;
+  g_assert (!priv->input);
+  g_assert (!priv->node);
+
+  priv->input = gegl_node_get_input_proxy (operation->node, "input");
+  priv->node = gegl_node_new_child (operation->node,
+                                    "operation", "gegl:nop",
+                                    NULL);
+
+  gegl_node_link (priv->input, priv->node);
+  g_object_set (G_OBJECT (priv->view_widget), "node", priv->node, NULL);
 }
 
 static void
@@ -207,8 +133,6 @@ dispose (GObject *object)
   if (priv)
     {
       gtk_widget_destroy (priv->window);
-      if (priv->buf)
-        g_free (priv->buf);
       g_free (priv);
       o->chant_data = NULL;
     }
@@ -220,13 +144,10 @@ dispose (GObject *object)
 static void
 gegl_chant_class_init (GeglChantClass *klass)
 {
-  GeglOperationClass     *operation_class;
-  GeglOperationSinkClass *sink_class;
+  GeglOperationClass     *operation_class = GEGL_OPERATION_CLASS (klass);
+  GeglOperationSinkClass *sink_class = GEGL_OPERATION_SINK_CLASS (klass);
 
-  operation_class = GEGL_OPERATION_CLASS (klass);
-  sink_class      = GEGL_OPERATION_SINK_CLASS (klass);
-
-  sink_class->process = process;
+  operation_class->attach = attach;
   G_OBJECT_CLASS (klass)->dispose = dispose;
 
 #ifdef HAVE_GTK2

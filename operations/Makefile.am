@@ -1,9 +1,10 @@
 
 ext_dir = $(GEGL_PLUGINS_DIR)
+libgeglgtk = $(top_builddir)/gegl-gtk/libgegl-gtk$(GEGL_GTK_GTK_VERSION)-$(GEGL_GTK_API_VERSION).la
 
-LIBS            = $(GTK_LIBS) $(GEGL_LIBS)
-CFLAGS			= $(GTK_CFLAGS) $(GEGL_CFLAGS)
-LDFLAGS			= -avoid-version -export-dynamic -module
+op_LIBS            = $(GTK_LIBS) $(GEGL_LIBS) $(libgeglgtk)
+op_CFLAGS			= $(GTK_CFLAGS) $(GEGL_CFLAGS)
+op_LDFLAGS			= -avoid-version -export-dynamic -module
 
 CFILES          = $(wildcard $(srcdir)/*.c)
 plugins         = $(subst gegl-gtk-,gegl-gtk@GEGL_GTK_GTK_VERSION@-, $(subst $(srcdir)/,,$(CFILES:.c=.la)))
@@ -20,9 +21,8 @@ gegl_lt_ccld_v_0 = @echo "  CCLD   " $@;
 all-local: $(plugins)
 
 gegl-gtk@GEGL_GTK_GTK_VERSION@-%.la: gegl-gtk-%.c
-	$(gegl_lt_cc_v) $(LIBTOOL) --quiet --tag=CC --mode=compile $(CC) $(DEFS) -I. -I$(top_builddir) -I$(srcdir) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o $@.lo $<
-	$(gegl_lt_ccld_v) $(LIBTOOL) --quiet --tag=CC --mode=link $(CC) $(AM_LDFLAGS) $(LDFLAGS) $(CFLAGS) -o $@ -rpath $(ext_dir) $@.lo $(LIBS) $(MATH_LIB)
-
+	$(gegl_lt_cc_v) $(LIBTOOL) --quiet --tag=CC --mode=compile $(CC) $(DEFS) -I. -I$(top_builddir) -I$(top_srcdir)/gegl-gtk -I$(srcdir) $(AM_CPPFLAGS) $(CPPFLAGS) $(op_CFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o $@.lo $<
+	$(gegl_lt_ccld_v) $(LIBTOOL) --quiet --tag=CC --mode=link $(CC) $(AM_LDFLAGS) $(op_LDFLAGS) $(op_CFLAGS) $(CFLAGS) -o $@ -rpath $(ext_dir) $@.lo $(op_LIBS) $(MATH_LIB)
 
 clean-local:
 	rm -f *.la
