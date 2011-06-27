@@ -28,7 +28,7 @@ gegl_chant_string  (window_title, _("Window Title"), "",
 #else
 
 #define GEGL_CHANT_TYPE_SINK
-#define GEGL_CHANT_C_FILE       "gtk-display.c"
+#define GEGL_CHANT_C_FILE       "gegl-gtk-display.c"
 
 #include <gegl.h>
 #include <gegl-chant.h>

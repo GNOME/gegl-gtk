@@ -6,8 +6,8 @@ CFLAGS			= $(GTK_CFLAGS) $(GEGL_CFLAGS)
 LDFLAGS			= -avoid-version -export-dynamic -module
 
 CFILES          = $(wildcard $(srcdir)/*.c)
-plugins         = $(subst $(srcdir)/,,$(CFILES:.c=.la))
-INSTALLED_ITEMS = $(subst $(srcdir)/,$(ext_dir)/,$(CFILES:.c=$(SHREXT)))
+plugins         = $(subst gegl-gtk-,gegl-gtk@GEGL_GTK_GTK_VERSION@-, $(subst $(srcdir)/,,$(CFILES:.c=.la)))
+INSTALLED_ITEMS = $(subst gegl-gtk-,gegl-gtk@GEGL_GTK_GTK_VERSION@-, $(subst $(srcdir)/,$(ext_dir)/,$(CFILES:.c=$(SHREXT))))
 EXTRA_DIST      = $(wildcard *.c) $(wildcard *.h)
 
 gegl_lt_cc_v = $(gegl_lt_cc_v_$(V))
@@ -19,7 +19,7 @@ gegl_lt_ccld_v_0 = @echo "  CCLD   " $@;
 
 all-local: $(plugins)
 
-%.la: %.c
+gegl-gtk@GEGL_GTK_GTK_VERSION@-%.la: gegl-gtk-%.c
 	$(gegl_lt_cc_v) $(LIBTOOL) --quiet --tag=CC --mode=compile $(CC) $(DEFS) -I. -I$(top_builddir) -I$(srcdir) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o $@.lo $<
 	$(gegl_lt_ccld_v) $(LIBTOOL) --quiet --tag=CC --mode=link $(CC) $(AM_LDFLAGS) $(LDFLAGS) $(CFLAGS) -o $@ -rpath $(ext_dir) $@.lo $(LIBS) $(MATH_LIB)
 
