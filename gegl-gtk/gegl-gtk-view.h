@@ -19,6 +19,8 @@
 #ifndef __GEGL_GTK_VIEW_H__
 #define __GEGL_GTK_VIEW_H__
 
+#include <gtk/gtk.h>
+
 G_BEGIN_DECLS
 
 #define GEGL_GTK_TYPE_VIEW            (gegl_gtk_view_get_type ())
