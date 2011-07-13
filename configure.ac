@@ -182,7 +182,7 @@ AM_CONDITIONAL(ENABLE_DOCS, test "x$enable_docs" = "xyes")
 ########################
 # Check GObject Introspection
 ########################
-GOBJECT_INTROSPECTION_CHECK([0.6.7])
+GOBJECT_INTROSPECTION_REQUIRE([0.9.5])
 
 ######################################
 # Checks for BABL
