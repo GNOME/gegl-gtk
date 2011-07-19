@@ -179,11 +179,6 @@ AC_ARG_ENABLE([docs],
 
 AM_CONDITIONAL(ENABLE_DOCS, test "x$enable_docs" = "xyes")
 
-########################
-# Check GObject Introspection
-########################
-GOBJECT_INTROSPECTION_REQUIRE([0.9.5])
-
 ######################################
 # Checks for BABL
 ######################################
@@ -228,6 +223,19 @@ AM_CONDITIONAL(HAVE_GTK3, test "$have_gtk" = "3.0")
 	
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
+
+########################
+# Check GObject Introspection
+########################
+AC_ARG_ENABLE([introspection],
+              [  --disable-introspection        disable GObject introspection support (default=no)],,
+              enable_introspection="yes")
+
+if test "x$enable_introspection" = "xyes"; then
+	GOBJECT_INTROSPECTION_REQUIRE([0.9.5]) # Will abort on failure
+fi
+
+AM_CONDITIONAL(HAVE_INTROSPECTION, test "x$enable_introspection" = "xyes")
 
 ######################################
 # Checks for gtk-doc and docbook-tools
