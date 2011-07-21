@@ -36,6 +36,12 @@ enum
   PROP_BLOCK
 };
 
+enum
+{
+  SIGNAL_REDRAW,
+  N_SIGNALS
+};
+
 
 typedef struct _GeglGtkViewPrivate
 {
@@ -53,6 +59,8 @@ typedef struct _GeglGtkViewPrivate
 G_DEFINE_TYPE (GeglGtkView, gegl_gtk_view, GTK_TYPE_DRAWING_AREA)
 #define GEGL_GTK_VIEW_GET_PRIVATE(obj) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((obj), GEGL_GTK_TYPE_VIEW, GeglGtkViewPrivate))
+
+static guint gegl_gtk_view_signals[N_SIGNALS] = { 0 };
 
 static void      gegl_gtk_view_class_init (GeglGtkViewClass  *klass);
 static void      gegl_gtk_view_init       (GeglGtkView       *self);
@@ -73,6 +81,10 @@ static gboolean  expose_event         (GtkWidget      *widget,
 static gboolean  draw                 (GtkWidget * widget,
                                        cairo_t *cr);
 #endif
+
+static void      redraw_event (GeglGtkView *view,
+                               GeglRectangle *rect,
+                               gpointer data);
 
 static void      gegl_gtk_view_repaint       (GeglGtkView *view);
 
@@ -129,6 +141,16 @@ gegl_gtk_view_class_init (GeglGtkViewClass * klass)
                                                         FALSE,
                                                         G_PARAM_READWRITE));
 
+  /* Emitted when a redraw is needed, with the area that needs redrawing.
+   * Exposed so that it can be tested. */
+  gegl_gtk_view_signals[SIGNAL_REDRAW] = g_signal_new ("redraw",
+                G_TYPE_FROM_CLASS (klass),
+                G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
+                0,
+                NULL, NULL,
+                g_cclosure_marshal_VOID__BOXED,
+                G_TYPE_NONE, 1,
+                GEGL_TYPE_RECTANGLE);
 
    g_type_class_add_private (klass, sizeof (GeglGtkViewPrivate));
 }
@@ -143,6 +165,8 @@ gegl_gtk_view_init (GeglGtkView *self)
   priv->scale       = 1.0;
   priv->monitor_id  = 0;
   priv->processor   = NULL;
+
+  g_signal_connect(self, "redraw", G_CALLBACK (redraw_event), NULL);
 }
 
 static void
@@ -176,8 +200,21 @@ computed_event (GeglNode      *self,
   gint y = priv->scale * (rect->y) - priv->y;
   gint w = ceil (priv->scale * rect->width  + 1);
   gint h = ceil (priv->scale * rect->height + 1);
+  GeglRectangle redraw_rect = {x, y, w, h};
 
-  gtk_widget_queue_draw_area (GTK_WIDGET (view), x, y, w, h);
+  g_signal_emit (view, gegl_gtk_view_signals[SIGNAL_REDRAW],
+	         0, &redraw_rect, NULL);
+
+}
+
+static void
+redraw_event (GeglGtkView *view,
+              GeglRectangle *rect,
+              gpointer data)
+{
+  gtk_widget_queue_draw_area (GTK_WIDGET (view),
+			      rect->x, rect->y,
+			      rect->width, rect->height);
 }
 
 
