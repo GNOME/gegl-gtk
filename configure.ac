@@ -108,8 +108,8 @@ AC_SUBST(PACKAGE_NAME)
 
 GEGL_PLUGINS_DIR=`pkg-config gegl --variable=pluginsdir`
 if test -z $GEGL_PLUGINS_DIR; then
-	AC_MSG_ERROR(
-        [no pluginsdir set in GEGL pkg-config file])
+	GEGL_PREFIX=`pkg-config gegl --variable=prefix`
+	GEGL_PLUGINS_DIR=$GEGL_PREFIX/lib/gegl-0.1
 fi
 AC_SUBST(GEGL_PLUGINS_DIR)
 
