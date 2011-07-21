@@ -84,10 +84,6 @@ test_sanity(void)
 }
 
 /* TODO:
- * - Test redraw with translation
- * - Test redraw with scaling
- * - Test redraw with rotation
- * Benchmarks for cases above
  * Actual drawing tests, checking the output of the widget against a
  * well known reference. Ideally done with a fake/dummy windowing backend,
  * so it can be done quickly, without external influences.

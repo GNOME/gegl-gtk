@@ -120,39 +120,37 @@ needs_redraw_event(ViewHelper *helper,
     g_assert(test_utils_compare_rect(rect, data->expected_result));
 }
 
+
 /* Test that the redraw signal is emitted when the GeglNode has been computed.
  *
  * NOTE: Does not test that the actual drawing happens, or even
  * that queue_redraw is called, as this is hard to observe reliably
  * Redraws can be triggered by other things, and the exposed events
- * can be coalesced. */
+ * can be coalesced by GTK. */
 static void
-test_redraw_on_computed(void)
+test_redraw_on_computed (int x, int y, float scale,
+                         GeglRectangle *input, GeglRectangle *output)
 {
     ViewHelperTest test;
-    GeglRectangle computed_rect = {0, 0, 128, 128};
     RedrawTestState test_data;
-    test_data.needs_redraw_called = FALSE;
-    test_data.expected_result = &computed_rect;
+    test_data.expected_result = output;
 
     setup_helper_test(&test);
     /* Setup will invalidate the node, make sure those events are processed. */
     while (gtk_events_pending()) {
         gtk_main_iteration();
     }
-    gegl_node_process(test.out);
+    gegl_node_process (test.out);
 
-    g_assert(IS_VIEW_HELPER(test.helper));
+    view_helper_set_x(test.helper, x);
+    view_helper_set_y(test.helper, y);
+    view_helper_set_scale(test.helper, scale);
 
-    /* TODO: when adding tests for transformed cases,
-     * split out a function for testing the redrawn area, given
-     * the input area and the transformation (translation, scaling, rotation) */
     g_signal_connect(G_OBJECT(test.helper), "redraw-needed",
-                     G_CALLBACK(needs_redraw_event),
-                     &test_data);
+                      G_CALLBACK(needs_redraw_event),
+                      &test_data);
 
-
-    g_signal_emit_by_name(test.out, "computed", &computed_rect, NULL);
+    g_signal_emit_by_name(test.out, "computed", input, NULL);
 
     g_timeout_add(300, test_utils_quit_gtk_main, NULL);
     gtk_main();
@@ -160,6 +158,38 @@ test_redraw_on_computed(void)
     g_assert(test_data.needs_redraw_called);
 
     teardown_helper_test(&test);
+}
+
+static void
+test_redraw_basic()
+{
+    GeglRectangle computed_rect = {0, 0, 128, 128};
+    GeglRectangle redraw_rect = {0, 0, 128, 128};
+    test_redraw_on_computed (0, 0, 1.0, &computed_rect, &redraw_rect);
+}
+
+static void
+test_redraw_translated()
+{
+    GeglRectangle computed_rect = {0, 0, 128, 128};
+    GeglRectangle redraw_rect = {-11, -11, 128, 128};
+    test_redraw_on_computed (11, 11, 1.0, &computed_rect, &redraw_rect);
+}
+
+static void
+test_redraw_scaled()
+{
+    GeglRectangle computed_rect = {0, 0, 128, 128};
+    GeglRectangle redraw_rect = {0, 0, 256, 256};
+    test_redraw_on_computed (0, 0, 2.0, &computed_rect, &redraw_rect);
+}
+
+static void
+test_redraw_combined()
+{
+    GeglRectangle computed_rect = {0, 0, 128, 128};
+    GeglRectangle redraw_rect = {10, 10, 256, 256};
+    test_redraw_on_computed (-10, -10, 2.0, &computed_rect, &redraw_rect);
 }
 
 int
@@ -172,7 +202,10 @@ main(int argc, char **argv)
     g_test_init(&argc, &argv, NULL);
 
     g_test_add_func("/widgets/view/helper/processing", test_processing);
-    g_test_add_func("/widgets/view/helper/redraw-on-computed", test_redraw_on_computed);
+    g_test_add_func("/widgets/view/redraw-basic", test_redraw_basic);
+    g_test_add_func("/widgets/view/redraw-scaled", test_redraw_scaled);
+    g_test_add_func("/widgets/view/redraw-translated", test_redraw_translated);
+    g_test_add_func("/widgets/view/redraw-combined", test_redraw_combined);
 
     retval = g_test_run();
     gegl_exit();
