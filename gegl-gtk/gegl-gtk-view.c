@@ -198,8 +198,8 @@ computed_event (GeglNode      *self,
   GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (view);
   gint x = priv->scale * (rect->x) - priv->x;
   gint y = priv->scale * (rect->y) - priv->y;
-  gint w = ceil (priv->scale * rect->width  + 1);
-  gint h = ceil (priv->scale * rect->height + 1);
+  gint w = ceil (priv->scale * rect->width);
+  gint h = ceil (priv->scale * rect->height);
   GeglRectangle redraw_rect = {x, y, w, h};
 
   g_signal_emit (view, gegl_gtk_view_signals[SIGNAL_REDRAW],
@@ -256,6 +256,7 @@ set_property (GObject      *gobject,
           gegl_gtk_view_repaint (self);
         }
       else
+
         {
           priv->node = NULL;
         }
