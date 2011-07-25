@@ -4,6 +4,11 @@
 #include <gegl-gtk-view.h>
 #include <gegl.h>
 
+gboolean
+test_utils_display_is_set () {
+  return g_getenv ("DISPLAY");
+}
+
 void
 test_utils_print_rect (GeglRectangle *rect) {
 
@@ -130,6 +135,12 @@ int
 main (int argc, char **argv) {
 
     int retval = -1;
+
+    /* Currently all tests depend on having a display server */
+    if (!test_utils_display_is_set()) {
+        g_printf("%s", "Warning: Skipping tests due to missing display server.\n");
+        exit(0);
+    }
 
     g_thread_init(NULL);
     gtk_init(&argc, &argv);
