@@ -253,6 +253,23 @@ AC_CHECK_PROGS(PERL, perl5 perl)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "gegl-gtk-$GEGL_GTK_API_VERSION",
                    [Our gettext translation domain.])
 
+####################
+# Check for xvfb-run
+####################
+
+AC_ARG_WITH(xvfb-run,  [  --without-xvfb-run      Do not use xvfb-run for UI-dependent automatic tests])
+
+have_xvfb_run="no (disabled)"
+if test "x$with_xvfb_run" != "xno"; then
+  AC_PATH_PROG(XVFB_RUN, xvfb-run, no)
+  if test "x$XVFB_RUN" != "xno"; then
+    have_xvfb_run="yes"
+  else
+    have_xvfb_run="no (not found)"
+  fi
+fi
+AM_CONDITIONAL(HAVE_XVFB_RUN, test "x$have_xvfb_run" == "xyes")
+
 #######################
 # Enable extra warnings
 #######################

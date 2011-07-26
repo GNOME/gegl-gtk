@@ -13,7 +13,15 @@ endif
 
 # ----------------------------------------------
 # Rules for hooking up the unit/functional tests
-GTESTER = gtester
+
+TESTS_ENVIRONMENT = 
+
+# Run tests with xvfb-run if available
+if HAVE_XVFB_RUN
+TESTS_ENVIRONMENT += $(XVFB_RUN) --server-args="-screen 0 1280x1024x24"
+endif
+
+GTESTER = $(TESTS_ENVIRONMENT) gtester
 GTESTER_REPORT = gtester-report
 
 # test: run all tests
