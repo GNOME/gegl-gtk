@@ -56,4 +56,18 @@ typelibdir = $(libdir)/girepository-1.0
 typelib_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
 
 CLEANFILES += $(gir_DATA) $(typelib_DATA)
-endif
+
+if HAVE_VALA
+gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.vapi: \
+	GeglGtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.gir
+
+	$(VAPIGEN) --pkg gtk+-@GEGL_GTK_GTK_VERSION@.0 \
+	--library=gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@ \
+	GeglGtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.gir
+
+vapidir=$(datadir)/vala/vapi
+vapi_DATA = gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.vapi
+
+endif # HAVE_VALA
+
+endif # HAVE_INTROSPECTION
