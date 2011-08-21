@@ -1,22 +1,75 @@
+gegl-gtk: Utility library for using GEGL in GTK+ based applications.
+
 License: Library is LGPLv3+, examples GPLv3+
+Maintainer: Jon Nordby <jononor@gmail.com>
+Homepage: http://www.gegl.org
+Code: http://git.gnome.org/browse/gegl-gtk/
+Bugtracker: http://bugs.gnome.org, product GEGL, component gegl-gtk
+Mailinglist: http://blog.gmane.org/gmane.comp.video.gegl.devel
+
+== Installing ==
+gegl-gtk uses an autotools build system. To install do:
+ ./autogen.sh (from git) or ./configure (from tarball)
+ make
+ make install
+
+To install to a custom prefix, pass --prefix to autogen.sh/configure. Example:
+ ./autogen.sh --prefix=/home/user/gegl-gtk
+
+gegl-gtk uses pkg-config to find its dependencies, set PKG_CONFIG_PATH to
+configure which dependencies it is built against.
+
+== Using ==
+To use gegl-gtk in your project from C, use the provided pkg-config file
+ pkg-config gegl-gtk2-0.1 --libs --cflags
+
+gegl-gtk also has GObject Introspection support, and can be used from
+languages like Python, Vala and Javascript.
+
+== Documentation ==
+See this file, the examples and source code, for now. :)
+
+== Contributing ==
+To contribute code, please file a bug and attach git-formatted patches there, or link to
+a public git branch which has the commits (on github for instance).
+For quick, simple and obvious fixes, you may send a patch to the mailinglist.
+
+For a list of tasks that needs to be done see the TODO section of this document,
+and the TODO, FIXME and XXX comments in the source code.
 
 == TODO ==
+Currently the focus is on the 0.1.0 release. The 0.1 series will
+have a basic set of features, and maintain ABI and API compatability.
+
+=== 0.1.0 ===
+First release. Goal: minimally useful, solid interfaces.
+Should at happen before or together with the next Gegl release.
+Need to build and work with whatever is the latest Gegl release.
+
+* Sanitize coding style
+* API review, check naming
+* Change translation properties (x,y) to take floats
+* Add new() and set_input_node() methods to GeglView
+* Simple examples for all provided features
+
+* Register display operation in a generic way with GEGL (needs work in GEGL)
+* Display operation needs to spin its own mainloop
+
+* Test bindings. At least using Python and Vala (maybe JavaScript)
+
+(hopefully, can be punted)
+* Add API for getting model->view transformation matrix
+* Add add support for autoscaling and autocentering
+* Add signals for drawing widget background and overlay
+* Tests for transformations
+
+=== Later ===
 General
 * Write a Gegl based GdkPixbuf loader plugin
+* API documentation build
 
 GeglView
-* Write tests
-* Write benchmark
-* Add API for getting model->view transformation matrix
 * Add rotation support
-* Add signals for drawing widget background and overlay
-* Add property to change scaling/cropping/streching behavior
-
-gtk-display
-* Use GeglView instead of custom widget
-
-examples
-* Add a way to manipulate view transformation to paint example
 
 == BUGS ==
 * On first redraw of GeglGtkView, there is sometimes a segfault inside babl:
