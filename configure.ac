@@ -211,7 +211,7 @@ case "$with_gtk" in
 
 	3.0) PKG_CHECK_MODULES(GTK, gtk+-3.0 >= gtk3_required_version,
 		[have_gtk="3.0" GEGL_GTK_GTK_VERSION="3"
-		AC_DEFINE(HAVE_GTK2, 1, [Define to 1 to compile for gtk2])],
+		AC_DEFINE(HAVE_GTK3, 1, [Define to 1 to compile for gtk3])],
 		[]) ;;
 	*) ;;
 esac
