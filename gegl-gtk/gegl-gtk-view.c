@@ -320,7 +320,6 @@ draw_implementation (GeglGtkViewPrivate *priv, cairo_t *cr, GdkRectangle *rect)
 {
   cairo_surface_t *surface = NULL;
   guchar          *buf = NULL;
-  Babl            *format = NULL;
   GeglRectangle   roi;
 
   roi.x = priv->x + rect->x;
@@ -330,16 +329,10 @@ draw_implementation (GeglGtkViewPrivate *priv, cairo_t *cr, GdkRectangle *rect)
 
   buf = g_malloc ((roi.width) * (roi.height) * 4);
 
-  format = babl_format_new (babl_model ("RGBA"), babl_type ("u8"),
-                            babl_component ("B"),
-                            babl_component ("G"),
-                            babl_component ("R"),
-                            babl_component ("A"),
-                            NULL);
   gegl_node_blit (priv->node,
                   priv->scale,
                   &roi,
-                  format,
+                  babl_format ("B'aG'aR'aA u8"),
                   (gpointer)buf,
                   GEGL_AUTO_ROWSTRIDE,
                   GEGL_BLIT_CACHE | (priv->block ? 0 : GEGL_BLIT_DIRTY));
