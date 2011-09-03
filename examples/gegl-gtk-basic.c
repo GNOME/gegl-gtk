@@ -55,8 +55,8 @@ main (gint    argc,
   view = g_object_new (GEGL_GTK_TYPE_VIEW, "node", node, NULL);
   gtk_container_add (GTK_CONTAINER (window), view);
 
-  g_signal_connect (G_OBJECT (window), "delete-event",
-                    G_CALLBACK (gtk_main_quit), window);
+  g_signal_connect (window, "destroy", 
+                    G_CALLBACK (gtk_main_quit), NULL);
   gtk_widget_show_all (window);
 
   /* Run */
@@ -64,7 +64,6 @@ main (gint    argc,
 
   /* Cleanup */
   g_object_unref (graph);
-  gtk_widget_destroy (window);
   gegl_exit ();
   return 0;
 }
