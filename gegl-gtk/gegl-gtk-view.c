@@ -344,7 +344,7 @@ draw_implementation (GeglGtkViewPrivate *priv, cairo_t *cr, GdkRectangle *rect)
   cairo_set_source_surface (cr, surface, rect->x, rect->y);
   cairo_paint (cr);
 
-  cairo_surface_finish (surface);
+  cairo_surface_destroy (surface);
   g_free (buf);
 
 }
