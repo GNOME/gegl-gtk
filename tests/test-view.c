@@ -3,10 +3,11 @@
 
 #include <gegl-gtk-view.h>
 #include <gegl.h>
+#include <string.h>
 
 gboolean
 test_utils_display_is_set () {
-  return g_getenv ("DISPLAY");
+  return g_getenv ("DISPLAY") != NULL;
 }
 
 void
@@ -212,7 +213,7 @@ main (int argc, char **argv) {
     /* Currently all tests depend on having a display server */
     if (!test_utils_display_is_set()) {
         g_printf("%s", "Warning: Skipping tests due to missing display server.\n");
-        exit(0);
+        return 0;
     }
 
     g_thread_init(NULL);

@@ -98,6 +98,7 @@ set_window_attributes (GeglOperation *operation, const GeglRectangle *result)
         }
       else
         {
+          const gchar *gegl_node_get_debug_name (GeglNode *node);
           gtk_window_set_title (GTK_WINDOW (priv->window),
           gegl_node_get_debug_name (gegl_node_get_producer(operation->node, "input", NULL))
           );
