@@ -1,2 +1,3 @@
 *.gir
 *.typelib
+*.vapi
