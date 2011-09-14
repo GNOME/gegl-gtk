@@ -321,5 +321,7 @@ dnl Print a summary of features enabled/disabled:
 AC_MSG_RESULT([
 Building GEGL with prefix=$prefix
 
-  GTK+ version:     $have_gtk
+  GTK+ version:           $have_gtk
+  GObject Introspection:  $enable_introspection
+  Vala support:           $have_vala
 ]);
