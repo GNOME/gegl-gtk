@@ -238,43 +238,19 @@ set_property (GObject      *gobject,
   switch (property_id)
     {
     case PROP_NODE:
-      if (priv->node)
-        {
-          g_object_unref (priv->node);
-        }
-
-      if (g_value_get_object (value))
-        {
-          priv->node = GEGL_NODE (g_value_dup_object (value));
-
-          g_signal_connect_object (priv->node, "computed",
-                                   G_CALLBACK (computed_event),
-                                   self, 0);
-          g_signal_connect_object (priv->node, "invalidated",
-                                   G_CALLBACK (invalidated_event),
-                                   self, 0);
-          gegl_gtk_view_repaint (self);
-        }
-      else
-
-        {
-          priv->node = NULL;
-        }
+      gegl_gtk_view_set_node(self, GEGL_NODE(g_value_get_object(value)));
       break;
     case PROP_X:
-      priv->x = g_value_get_int (value);
-      gtk_widget_queue_draw (GTK_WIDGET (self));
+      gegl_gtk_view_set_x(self, g_value_get_int(value));
       break;
     case PROP_BLOCK:
       priv->block = g_value_get_boolean (value);
       break;
     case PROP_Y:
-      priv->y = g_value_get_int (value);
-      gtk_widget_queue_draw (GTK_WIDGET (self));
+      gegl_gtk_view_set_y(self, g_value_get_int(value));
       break;
     case PROP_SCALE:
-      priv->scale = g_value_get_double (value);
-      gtk_widget_queue_draw (GTK_WIDGET (self));
+      gegl_gtk_view_set_scale(self, g_value_get_double(value));
       break;
     default:
 
@@ -295,19 +271,19 @@ get_property (GObject      *gobject,
   switch (property_id)
     {
     case PROP_NODE:
-      g_value_set_object (value, priv->node);
+      g_value_set_object (value, gegl_gtk_view_get_node(self));
       break;
     case PROP_X:
-      g_value_set_int (value, priv->x);
+      g_value_set_int (value, gegl_gtk_view_get_x(self));
       break;
     case PROP_BLOCK:
       g_value_set_boolean (value, priv->block);
       break;
     case PROP_Y:
-      g_value_set_int (value, priv->y);
+      g_value_set_int (value, gegl_gtk_view_get_y(self));
       break;
     case PROP_SCALE:
-      g_value_set_double (value, priv->scale);
+      g_value_set_double (value, gegl_gtk_view_get_scale(self));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -440,4 +416,118 @@ gegl_gtk_view_repaint (GeglGtkView *view)
 
   if (priv->processor)
     gegl_processor_set_rectangle (priv->processor, &roi);
+}
+
+
+GeglGtkView *
+gegl_gtk_view_new()
+{
+    return GEGL_GTK_VIEW(g_object_new (GEGL_GTK_TYPE_VIEW, NULL));
+}
+
+GeglGtkView *
+gegl_gtk_view_new_for_node(GeglNode *node)
+{
+    GeglGtkView *view = gegl_gtk_view_new();
+    gegl_gtk_view_set_node(view, node);
+    return view;
+}
+
+
+void
+gegl_gtk_view_set_node(GeglGtkView *self, GeglNode *node)
+{
+    GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (self);
+
+    if (priv->node == node)
+        return;
+
+    if (priv->node)
+        g_object_unref (priv->node);
+
+    if (node) {
+        g_object_ref (node);
+        priv->node = node;
+
+        g_signal_connect_object (priv->node, "computed",
+                               G_CALLBACK (computed_event),
+                               self, 0);
+        g_signal_connect_object (priv->node, "invalidated",
+                               G_CALLBACK (invalidated_event),
+                               self, 0);
+
+        gegl_gtk_view_repaint (self);
+
+    } else
+        priv->node = NULL;
+
+}
+
+/**
+ * gegl_gtk_view_get_node:
+ *
+ * Returns: (transfer none): The #GeglNode this widget displays
+ */
+GeglNode *
+gegl_gtk_view_get_node(GeglGtkView *self)
+{
+    GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE (self);
+    return priv->node;
+}
+
+void
+gegl_gtk_view_set_scale(GeglGtkView *self, float scale)
+{
+    GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
+
+    if (priv->scale == scale)
+        return;
+
+    priv->scale = scale;
+    gtk_widget_queue_draw(GTK_WIDGET (self));
+}
+
+float
+gegl_gtk_view_get_scale(GeglGtkView *self)
+{
+    GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
+    return priv->scale;
+}
+
+void
+gegl_gtk_view_set_x(GeglGtkView *self, int x)
+{
+    GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
+
+    if (priv->x == x)
+        return;
+
+    priv->x = x;
+    gtk_widget_queue_draw(GTK_WIDGET (self));
+}
+
+int
+gegl_gtk_view_get_x(GeglGtkView *self)
+{
+    GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
+    return priv->x;
+}
+
+void
+gegl_gtk_view_set_y(GeglGtkView *self, int y)
+{
+    GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
+
+    if (priv->y == y)
+        return;
+
+    priv->y = y;
+    gtk_widget_queue_draw(GTK_WIDGET (self));
+}
+
+int
+gegl_gtk_view_get_y(GeglGtkView *self)
+{
+    GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
+    return priv->y;
 }

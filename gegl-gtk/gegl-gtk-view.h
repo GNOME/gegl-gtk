@@ -20,6 +20,7 @@
 #define __GEGL_GTK_VIEW_H__
 
 #include <gtk/gtk.h>
+#include <gegl.h>
 
 G_BEGIN_DECLS
 
@@ -45,6 +46,22 @@ struct _GeglGtkViewClass
 };
 
 GType           gegl_gtk_view_get_type      (void) G_GNUC_CONST;
+
+
+GeglGtkView *gegl_gtk_view_new(void);
+GeglGtkView *gegl_gtk_view_new_for_node(GeglNode *node);
+
+void gegl_gtk_view_set_node(GeglGtkView *self, GeglNode *node);
+GeglNode *gegl_gtk_view_get_node(GeglGtkView *self);
+
+void gegl_gtk_view_set_scale(GeglGtkView *self, float scale);
+float gegl_gtk_view_get_scale(GeglGtkView *self);
+
+void gegl_gtk_view_set_x(GeglGtkView *self, int x);
+int gegl_gtk_view_get_x(GeglGtkView *self);
+
+void gegl_gtk_view_set_y(GeglGtkView *self, int y);
+int gegl_gtk_view_get_y(GeglGtkView *self);
 
 G_END_DECLS
 

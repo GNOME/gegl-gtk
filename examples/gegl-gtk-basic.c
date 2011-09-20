@@ -53,7 +53,7 @@ main (gint    argc,
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), "GEGL-GTK basic example");
 
-  view = g_object_new (GEGL_GTK_TYPE_VIEW, "node", node, NULL);
+  view = gegl_gtk_view_new_for_node(node);
   gtk_container_add (GTK_CONTAINER (window), view);
 
   g_signal_connect (window, "destroy", 
