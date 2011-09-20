@@ -306,6 +306,7 @@ Makefile
 gegl-gtk/Makefile
 operations/Makefile
 examples/Makefile
+examples/c/Makefile
 tests/Makefile
 docs/reference/Makefile
 gegl-gtk2-0.1.pc
