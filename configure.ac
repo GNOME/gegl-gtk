@@ -172,12 +172,6 @@ fi
 
 AC_C_RESTRICT
 
-dnl disable docs generation.
-AC_ARG_ENABLE([docs],
-              [  --disable-docs          disable docs generation (default=no)],,
-              enable_docs="yes")
-
-AM_CONDITIONAL(ENABLE_DOCS, test "x$enable_docs" = "xyes")
 
 ######################################
 # Checks for BABL
@@ -262,7 +256,7 @@ AM_CONDITIONAL(HAVE_VALA, test "$have_vala" = "yes")
 # Checks for gtk-doc and docbook-tools
 ######################################
 
-GTK_DOC_CHECK([1.0])
+GTK_DOC_CHECK([1.0], [--docdir docs --flavour no-tmpl])
 
 dnl NOTE: We need to use a separate automake conditional for this
 dnl   	  to make this work with the tarballs.
@@ -313,6 +307,7 @@ gegl-gtk/Makefile
 operations/Makefile
 examples/Makefile
 tests/Makefile
+docs/reference/Makefile
 gegl-gtk2-0.1.pc
 gegl-gtk3-0.1.pc
 ])
@@ -322,6 +317,7 @@ AC_MSG_RESULT([
 Building GEGL with prefix=$prefix
 
   GTK+ version:           $have_gtk
+  Documentation:          $enable_gtk_doc
   GObject Introspection:  $enable_introspection
   Vala support:           $have_vala
 ]);

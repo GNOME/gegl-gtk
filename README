@@ -48,8 +48,7 @@ Need to build and work with whatever is the latest Gegl release.
 
 * Sanitize coding style
 * API review, check naming
-* Change translation properties (x,y) to take floats
-* Add new() and set_input_node() methods to GeglView
+* Complete API documentation
 * Simple examples for all provided features
 
 * Register display operation in a generic way with GEGL (needs work in GEGL)

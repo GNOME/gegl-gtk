@@ -1,0 +1,6 @@
+html/*
+xml/*
+*.in
+gegl-gtk*
+*.stamp
+Makefile
