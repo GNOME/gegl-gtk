@@ -347,6 +347,7 @@ gegl-gtk/Makefile
 operations/Makefile
 examples/Makefile
 examples/c/Makefile
+examples/vala/Makefile
 tests/Makefile
 docs/reference/Makefile
 docs/reference/gegl-gtk-docs.xml
