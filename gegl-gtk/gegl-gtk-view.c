@@ -46,8 +46,8 @@ enum
 typedef struct _GeglGtkViewPrivate
 {
   GeglNode      *node;
-  gint           x;
-  gint           y;
+  gfloat         x;
+  gfloat         y;
   gdouble        scale;
   gboolean       block;    /* blocking render */
 
@@ -107,17 +107,17 @@ gegl_gtk_view_class_init (GeglGtkViewClass * klass)
 #endif
 
   g_object_class_install_property (gobject_class, PROP_X,
-                                   g_param_spec_int ("x",
+                                   g_param_spec_float ("x",
                                                      "X",
                                                      "X origin",
-                                                     G_MININT, G_MAXINT, 0,
+                                                     -G_MAXFLOAT, G_MAXFLOAT, 0.0,
                                                      G_PARAM_CONSTRUCT |
                                                      G_PARAM_READWRITE));
   g_object_class_install_property (gobject_class, PROP_Y,
-                                   g_param_spec_int ("y",
+                                   g_param_spec_float ("y",
                                                      "Y",
                                                      "Y origin",
-                                                     G_MININT, G_MAXINT, 0,
+                                                     -G_MAXFLOAT, G_MAXFLOAT, 0.0,
                                                      G_PARAM_CONSTRUCT |
                                                      G_PARAM_READWRITE));
   g_object_class_install_property (gobject_class, PROP_SCALE,
@@ -241,13 +241,13 @@ set_property (GObject      *gobject,
       gegl_gtk_view_set_node(self, GEGL_NODE(g_value_get_object(value)));
       break;
     case PROP_X:
-      gegl_gtk_view_set_x(self, g_value_get_int(value));
+      gegl_gtk_view_set_x(self, g_value_get_float(value));
       break;
     case PROP_BLOCK:
       priv->block = g_value_get_boolean (value);
       break;
     case PROP_Y:
-      gegl_gtk_view_set_y(self, g_value_get_int(value));
+      gegl_gtk_view_set_y(self, g_value_get_float(value));
       break;
     case PROP_SCALE:
       gegl_gtk_view_set_scale(self, g_value_get_double(value));
@@ -274,13 +274,13 @@ get_property (GObject      *gobject,
       g_value_set_object (value, gegl_gtk_view_get_node(self));
       break;
     case PROP_X:
-      g_value_set_int (value, gegl_gtk_view_get_x(self));
+      g_value_set_float (value, gegl_gtk_view_get_x(self));
       break;
     case PROP_BLOCK:
       g_value_set_boolean (value, priv->block);
       break;
     case PROP_Y:
-      g_value_set_int (value, gegl_gtk_view_get_y(self));
+      g_value_set_float (value, gegl_gtk_view_get_y(self));
       break;
     case PROP_SCALE:
       g_value_set_double (value, gegl_gtk_view_get_scale(self));
@@ -495,7 +495,7 @@ gegl_gtk_view_get_scale(GeglGtkView *self)
 }
 
 void
-gegl_gtk_view_set_x(GeglGtkView *self, int x)
+gegl_gtk_view_set_x(GeglGtkView *self, float x)
 {
     GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
 
@@ -506,7 +506,7 @@ gegl_gtk_view_set_x(GeglGtkView *self, int x)
     gtk_widget_queue_draw(GTK_WIDGET (self));
 }
 
-int
+float
 gegl_gtk_view_get_x(GeglGtkView *self)
 {
     GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
@@ -514,7 +514,7 @@ gegl_gtk_view_get_x(GeglGtkView *self)
 }
 
 void
-gegl_gtk_view_set_y(GeglGtkView *self, int y)
+gegl_gtk_view_set_y(GeglGtkView *self, float y)
 {
     GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
 
@@ -525,7 +525,7 @@ gegl_gtk_view_set_y(GeglGtkView *self, int y)
     gtk_widget_queue_draw(GTK_WIDGET (self));
 }
 
-int
+float
 gegl_gtk_view_get_y(GeglGtkView *self)
 {
     GeglGtkViewPrivate *priv = GEGL_GTK_VIEW_GET_PRIVATE(self);
