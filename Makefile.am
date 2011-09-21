@@ -24,7 +24,7 @@ EXTRA_DIST = \
 	gegl-gtk3-0.1.pc.in \
 	m4/introspection.m4
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
+DISTCHECK_CONFIGURE_FLAGS = --enable-introspection --enable-gtk-doc
 
 DISTCLEANFILES = \
 	$(built_dist_files)
