@@ -34,14 +34,18 @@ G_BEGIN_DECLS
 typedef struct _GeglGtkView        GeglGtkView;
 typedef struct _GeglGtkViewClass   GeglGtkViewClass;
 
+typedef struct _ViewHelper GeglGtkViewPrivate;
+
 struct _GeglGtkView
 {
+  /*< private >*/
   GtkDrawingArea parent_instance;
-
+  GeglGtkViewPrivate *priv; /* Can't use the GType private mechanism for GObjects */
 };
 
 struct _GeglGtkViewClass
 {
+  /*< private >*/
   GtkDrawingAreaClass parent_class;
 };
 

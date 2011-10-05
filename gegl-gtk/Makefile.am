@@ -4,10 +4,13 @@ headers = gegl-gtk.h gegl-gtk-view.h
 sources = gegl-gtk-view.c
 INCLUDES = $(GTK_CFLAGS) $(GEGL_CFLAGS)
 
+internal_headers = internal/view-helper.h
+internal_sources = internal/view-helper.c
+
 gegl_gtk_includedir=$(includedir)/gegl-gtk$(GEGL_GTK_GTK_VERSION)-$(GEGL_GTK_API_VERSION)
 gegl_gtk_include_HEADERS = $(headers)
 
-gegl_gtk_SOURCES = $(headers) $(sources)
+gegl_gtk_SOURCES = $(headers) $(sources) $(internal_headers) $(internal_sources)
 gegl_gtk_LIBADD  = $(GTK_LIBS) $(GEGL_LIBS)
 gegl_gtk_CFLAGS  = $(INCLUDES) $(CFLAGS)
 
