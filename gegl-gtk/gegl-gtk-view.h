@@ -22,6 +22,8 @@
 #include <gtk/gtk.h>
 #include <gegl.h>
 
+#include "gegl-gtk-enums.h"
+
 G_BEGIN_DECLS
 
 #define GEGL_GTK_TYPE_VIEW            (gegl_gtk_view_get_type ())
@@ -66,6 +68,9 @@ float gegl_gtk_view_get_x(GeglGtkView *self);
 
 void gegl_gtk_view_set_y(GeglGtkView *self, float y);
 float gegl_gtk_view_get_y(GeglGtkView *self);
+
+void gegl_gtk_view_set_autoscale_policy(GeglGtkView *self, GeglGtkViewAutoscale autoscale);
+GeglGtkViewAutoscale gegl_gtk_view_get_autoscale_policy(GeglGtkView *self);
 
 G_END_DECLS
 

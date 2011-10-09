@@ -58,6 +58,7 @@ main (gint    argc,
   scrolled = gtk_scrolled_window_new(NULL, NULL);
 
   view = GTK_WIDGET(gegl_gtk_view_new_for_node(node));
+  gegl_gtk_view_set_autoscale_policy(GEGL_GTK_VIEW(view), GEGL_GTK_VIEW_AUTOSCALE_WIDGET);
 
   gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrolled), view);
 

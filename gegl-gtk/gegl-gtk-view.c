@@ -46,7 +46,8 @@ enum
   PROP_X,
   PROP_Y,
   PROP_SCALE,
-  PROP_BLOCK
+  PROP_BLOCK,
+  PROP_AUTOSCALE_POLICY
 };
 
 
@@ -141,6 +142,12 @@ gegl_gtk_view_class_init (GeglGtkViewClass * klass)
                                                         "Make sure all data requested to blit is generated.",
                                                         FALSE,
                                                         G_PARAM_READWRITE));
+  g_object_class_install_property (gobject_class, PROP_AUTOSCALE_POLICY,
+                                   g_param_spec_enum ("autoscale-policy", NULL, NULL,
+                                                      GEGL_GTK_TYPE_VIEW_AUTOSCALE,
+                                                      GEGL_GTK_VIEW_AUTOSCALE_CONTENT,
+                                                      G_PARAM_READWRITE |
+                                                      G_PARAM_CONSTRUCT));
 
 }
 
@@ -191,6 +198,9 @@ set_property (GObject      *gobject,
     case PROP_SCALE:
       gegl_gtk_view_set_scale(self, g_value_get_double(value));
       break;
+    case PROP_AUTOSCALE_POLICY:
+      gegl_gtk_view_set_autoscale_policy(self, g_value_get_enum(value));
+      break;
     default:
 
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -223,6 +233,9 @@ get_property (GObject      *gobject,
       break;
     case PROP_SCALE:
       g_value_set_double (value, gegl_gtk_view_get_scale(self));
+      break;
+    case PROP_AUTOSCALE_POLICY:
+      g_value_set_enum (value, gegl_gtk_view_get_autoscale_policy(self));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -276,8 +289,6 @@ draw (GtkWidget * widget, cairo_t *cr)
 
   view_helper_draw (priv, cr, &rect);
 
-  view_helper_repaint (priv); /* Only needed due to possible allocation changes? */
-
   return FALSE;
 }
 #endif
@@ -303,8 +314,6 @@ expose_event (GtkWidget      *widget,
   view_helper_draw (priv, cr, &rect);
 
   cairo_destroy (cr);
-
-  view_helper_repaint (priv); /* Only needed due to possible allocation changes? */
 
   return FALSE;
 }
@@ -377,4 +386,16 @@ float
 gegl_gtk_view_get_y(GeglGtkView *self)
 {
     return view_helper_get_y(GET_PRIVATE(self));
+}
+
+void
+gegl_gtk_view_set_autoscale_policy(GeglGtkView *self, GeglGtkViewAutoscale autoscale)
+{
+    view_helper_set_autoscale_policy(GET_PRIVATE(self), autoscale);
+}
+
+GeglGtkViewAutoscale
+gegl_gtk_view_get_autoscale_policy(GeglGtkView *self)
+{
+    return view_helper_get_autoscale_policy(GET_PRIVATE(self));
 }

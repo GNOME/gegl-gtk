@@ -1,11 +1,24 @@
 CLEANFILES = 
 
-headers = gegl-gtk.h gegl-gtk-view.h
-sources = gegl-gtk-view.c
+gen_sources = gegl-gtk-enums.c
+CLEANFILES += $(gen_sources)
+
+headers = gegl-gtk.h gegl-gtk-view.h gegl-gtk-enums.h
+sources = gegl-gtk-view.c $(gen_sources)
 INCLUDES = $(GTK_CFLAGS) $(GEGL_CFLAGS)
 
 internal_headers = internal/view-helper.h
 internal_sources = internal/view-helper.c
+
+gegl-gtk-enums.c: $(srcdir)/gegl-gtk-enums.h
+	glib-mkenums \
+			   --fhead "/* This is a generated file, do not edit directly */\n\n#include \"config.h\"\n#include <glib-object.h>\n#include \"gegl-gtk-enums.h\"" \
+			   --fprod "\n/* enumerations from \"@filename@\" */" \
+			   --vhead "GType\n@enum_name@_get_type (void)\n{\n  static GType etype = 0;\n  if (etype == 0) {\n	static const G@Type@Value values[] = {" \
+			   --vprod "	  { @VALUENAME@, \"@valuenick@\", \"@valuenick@\" }," \
+			   --vtail "	  { 0, NULL, NULL }\n	};\n	etype = g_@type@_register_static (\"@EnumName@\", values);\n  }\n  return etype;\n}\n\n" \
+			   $(srcdir)/gegl-gtk-enums.h > gegl-gtk-enums.c
+
 
 gegl_gtk_includedir=$(includedir)/gegl-gtk$(GEGL_GTK_GTK_VERSION)-$(GEGL_GTK_API_VERSION)
 gegl_gtk_include_HEADERS = $(headers)

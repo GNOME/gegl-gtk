@@ -75,11 +75,12 @@ view_helper_init (ViewHelper *self)
   self->x           = 0;
   self->y           = 0;
   self->scale       = 1.0;
+  self->autoscale_policy = GEGL_GTK_VIEW_AUTOSCALE_CONTENT;
+
   self->monitor_id  = 0;
   self->processor   = NULL;
 
   self->widget_allocation = invalid_gdkrect;
-  self->view_bbox   = invalid_rect;
 }
 
 static void
@@ -115,6 +116,35 @@ model_rect_to_view_rect(ViewHelper *self, GeglRectangle *rect)
 }
 
 static void
+update_autoscale(ViewHelper *self)
+{
+    GdkRectangle viewport = self->widget_allocation;
+    GeglRectangle bbox = gegl_node_get_bounding_box(self->node);
+    model_rect_to_view_rect(self, &bbox);
+
+    if (!self->node || viewport.width < 0 || viewport.height < 0
+        || bbox.width < 0 || bbox.height < 0)
+        return;
+
+    if (self->autoscale_policy == GEGL_GTK_VIEW_AUTOSCALE_WIDGET) {
+        /* Request widget size change */
+        /* XXX: Should we reset scale/x/y here? */
+        g_signal_emit (self, view_helper_signals[SIGNAL_SIZE_CHANGED],
+             0, &bbox, NULL);
+
+    } else if (self->autoscale_policy == GEGL_GTK_VIEW_AUTOSCALE_CONTENT) {
+        /* Calculate and set scaling factor to make the content fit inside */
+        float width_ratio = bbox.width / (float)viewport.width;
+        float height_ratio = bbox.height / (float)viewport.height;
+        float max_ratio = width_ratio >= height_ratio ? width_ratio : height_ratio;
+
+        float current_scale = view_helper_get_scale(self);
+        view_helper_set_scale(self, current_scale*(1.0/max_ratio));
+    }
+
+}
+
+static void
 invalidated_event (GeglNode      *node,
                    GeglRectangle *rect,
                    ViewHelper    *self)
@@ -127,6 +157,7 @@ task_monitor (ViewHelper *self)
 {
   if (self->processor==NULL)
     return FALSE;
+
   if (gegl_processor_work (self->processor, NULL))
     return TRUE;
 
@@ -146,22 +177,14 @@ computed_event (GeglNode      *node,
                 GeglRectangle *rect,
                 ViewHelper    *self)
 {
-  /* Notify about potential size change */
-  GeglRectangle bbox = gegl_node_get_bounding_box(node);
-  model_rect_to_view_rect(self, &bbox);
+    update_autoscale(self);
 
-  if (!gegl_rectangle_equal(&bbox, &(self->view_bbox))) {
-      self->view_bbox = bbox;
-      g_signal_emit (self, view_helper_signals[SIGNAL_SIZE_CHANGED],
-                 0, &bbox, NULL);
-  }
+    /* Emit redraw-needed */
+    GeglRectangle redraw_rect = *rect;
+    model_rect_to_view_rect(self, &redraw_rect);
 
-  /* Emit redraw-needed */
-  GeglRectangle redraw_rect = *rect;
-  model_rect_to_view_rect(self, &redraw_rect);
-
-  g_signal_emit (self, view_helper_signals[SIGNAL_REDRAW_NEEDED],
-	         0, &redraw_rect, NULL);
+    g_signal_emit (self, view_helper_signals[SIGNAL_REDRAW_NEEDED],
+             0, &redraw_rect, NULL);
 }
 
 ViewHelper *
@@ -213,7 +236,7 @@ void
 view_helper_set_allocation(ViewHelper *self, GdkRectangle *allocation)
 {
     self->widget_allocation = *allocation;
-    view_helper_repaint(self);
+    update_autoscale(self);
 }
 
 /* Trigger processing of the GeglNode */
@@ -222,27 +245,25 @@ view_helper_repaint (ViewHelper *self)
 {
   GeglRectangle    roi;
 
+  if (!self->node)
+      return;
+
   roi.x = self->x / self->scale;
   roi.y = self->y / self->scale;
 
   roi.width = ceil(self->widget_allocation.width / self->scale+1);
   roi.height = ceil(self->widget_allocation.height / self->scale+1);
 
-  if (self->monitor_id == 0)
-    {
+  if (self->monitor_id == 0) {
       self->monitor_id = g_idle_add_full (G_PRIORITY_LOW,
                                           (GSourceFunc) task_monitor, self,
                                           NULL);
-
-      if (self->processor == NULL)
-        {
-          if (self->node)
-            self->processor = gegl_node_new_processor (self->node, &roi);
-        }
-    }
+  }
 
   if (self->processor)
-    gegl_processor_set_rectangle (self->processor, &roi);
+      gegl_processor_set_rectangle (self->processor, &roi);
+  else
+      self->processor = gegl_node_new_processor (self->node, &roi);
 }
 
 void
@@ -273,7 +294,7 @@ view_helper_set_node(ViewHelper *self, GeglNode *node)
                                G_CALLBACK (invalidated_event),
                                self, 0);
 
-        view_helper_repaint (self);
+        invalidate(self);
 
     } else
         self->node = NULL;
@@ -331,4 +352,20 @@ float
 view_helper_get_y(ViewHelper *self)
 {
     return self->y;
+}
+
+void
+view_helper_set_autoscale_policy(ViewHelper *self, GeglGtkViewAutoscale autoscale)
+{
+    if (self->autoscale_policy == autoscale)
+        return;
+
+    self->autoscale_policy = autoscale;
+    update_autoscale(self);
+}
+
+GeglGtkViewAutoscale
+view_helper_get_autoscale_policy(ViewHelper *self)
+{
+    return self->autoscale_policy;
 }

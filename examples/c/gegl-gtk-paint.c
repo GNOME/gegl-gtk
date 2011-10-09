@@ -165,7 +165,7 @@ main (gint    argc,
 
     gegl_node_link_many (loadbuf, out, NULL);
 
-    view = gegl_gtk_view_new_for_node(out);
+    view = GTK_WIDGET(gegl_gtk_view_new_for_node(out));
     top  = loadbuf;
   }
 

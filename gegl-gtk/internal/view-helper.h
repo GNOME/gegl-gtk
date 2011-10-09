@@ -22,6 +22,8 @@
 #include <glib-object.h>
 #include <gegl.h>
 #include <gtk/gtk.h>
+24ea1a60d4497df6cff9828093a8f6b9eed644cf
+#include <gegl-gtk-enums.h>
 
 G_BEGIN_DECLS
 
@@ -44,10 +46,11 @@ struct _ViewHelper
   gfloat         y;
   gdouble        scale;
   gboolean       block;    /* blocking render */
+  GeglGtkViewAutoscale autoscale_policy;
+
   guint          monitor_id;
   GeglProcessor *processor;
   GdkRectangle   widget_allocation; /* The allocated size of the widget */
-  GeglRectangle  view_bbox; /* Bounding box of the node, in view coordinates */
 };
 
 struct _ViewHelperClass
@@ -76,6 +79,8 @@ float view_helper_get_x(ViewHelper *self);
 void view_helper_set_y(ViewHelper *self, float y);
 float view_helper_get_y(ViewHelper *self);
 
+void view_helper_set_autoscale_policy(ViewHelper *self, GeglGtkViewAutoscale autoscale);
+GeglGtkViewAutoscale view_helper_get_autoscale_policy(ViewHelper *self);
 
 G_END_DECLS
 

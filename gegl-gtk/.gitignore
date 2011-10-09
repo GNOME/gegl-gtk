@@ -1,3 +1,4 @@
 *.gir
 *.typelib
 *.vapi
+gegl-gtk-enums.c
