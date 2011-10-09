@@ -1,3 +1,5 @@
+*.o
+test-view-helper
 test-view
 *report.xml
 *report.html

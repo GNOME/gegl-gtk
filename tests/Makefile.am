@@ -1,15 +1,13 @@
 
-check_PROGRAMS = test-view
+check_PROGRAMS = test-view test-view-helper
 
 test_view_SOURCES = test-view.c
 test_view_CPPFLAGS = $(GTK_CFLAGS) $(GEGL_CFLAGS) -I$(top_srcdir)/gegl-gtk
+test_view_LDADD = $(top_builddir)/gegl-gtk/libgegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.la $(GTK_LIBS) $(GEGL_LIBS)
 
-if HAVE_GTK2
-test_view_LDADD = $(top_builddir)/gegl-gtk/libgegl-gtk2-0.1.la $(GTK_LIBS) $(GEGL_LIBS)
-else
-test_view_LDADD = $(top_builddir)/gegl-gtk/libgegl-gtk3-0.1.la $(GTK_LIBS) $(GEGL_LIBS)
-endif
-
+test_view_helper_SOURCES = test-view-helper.c
+test_view_helper_CPPFLAGS = $(GTK_CFLAGS) $(GEGL_CFLAGS) -I$(top_srcdir)/gegl-gtk
+test_view_helper_LDADD = $(top_builddir)/gegl-gtk/libgegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.la $(GTK_LIBS) $(GEGL_LIBS)
 
 # ----------------------------------------------
 # Rules for hooking up the unit/functional tests

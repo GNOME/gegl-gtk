@@ -1,40 +1,11 @@
 
-#include <glib.h>
-
-#include <gegl-gtk-view.h>
-#include <gegl.h>
 #include <string.h>
 
-gboolean
-test_utils_display_is_set () {
-  return g_getenv ("DISPLAY") != NULL;
-}
+#include <glib.h>
+#include <gegl.h>
 
-void
-test_utils_print_rect (GeglRectangle *rect) {
-
-    g_print ("GeglRectangle: %d,%d %dx%d", rect->x, rect->y, rect->width, rect->height);
-}
-
-static gboolean
-test_utils_quit_gtk_main (gpointer data)
-{
-    gtk_main_quit();
-}
-
-/* Compare two rectangles, output */
-gboolean
-test_utils_compare_rect (GeglRectangle *r, GeglRectangle *s)
-{
-    gboolean equal = gegl_rectangle_equal (r, s);
-    if (!equal) {
-        test_utils_print_rect (r);
-        g_printf ("%s", " != ");
-        test_utils_print_rect (s);
-
-    }
-    return equal;
-}
+#include <gegl-gtk-view.h>
+#include "utils.c"
 
 /* Stores the state used in widget tests.*/
 typedef struct {
@@ -135,62 +106,7 @@ test_processing (void)
     teardown_widget_test(&test);
 }
 
-typedef struct {
-    gboolean needs_redraw_called;
-    GeglRectangle *expected_result;
-} RedrawTestState;
 
-static void
-needs_redraw_event (GeglGtkView *view,
-                GeglRectangle *rect,
-                RedrawTestState *data)
-{
-    data->needs_redraw_called = TRUE;
-
-    g_assert (test_utils_compare_rect (rect, data->expected_result));
-}
-
-/* Test that the redraw signal is emitted when the GeglNode has been computed.
- *
- * NOTE: Does not test that the actual drawing happens, or even
- * that queue_redraw is called, as this is hard to observe reliably
- * Redraws can be triggered by other things, and the exposed events
- * can be coalesced. */
-static void
-test_redraw_on_computed (void)
-{
-    ViewWidgetTest test;
-    GeglRectangle computed_rect = {0, 0, 128, 128};
-    RedrawTestState test_data;
-    test_data.expected_result = &computed_rect;
-
-    setup_widget_test(&test);
-    /* Setup will invalidate the node, make sure those events are processed. */
-    while (gtk_events_pending ()) {
-        gtk_main_iteration ();
-    }
-    gegl_node_process (test.out);
-
-    g_assert (GEGL_GTK_IS_VIEW (test.view));
-
-    /* TODO: when adding tests for transformed cases,
-     * split out a function for testing the redrawn area, given
-     * the input area and the transformation (translation, scaling, rotation) */
-    g_signal_connect (G_OBJECT (test.view), "redraw",
-                      G_CALLBACK (needs_redraw_event),
-                      &test_data);
-
-
-
-    g_signal_emit_by_name (test.out, "computed", &computed_rect, NULL);
-
-    g_timeout_add (300, test_utils_quit_gtk_main, NULL);
-    gtk_main ();
-
-    g_assert(test_data.needs_redraw_called);
-
-    teardown_widget_test(&test);
-}
 
 /* TODO:
  * - Test redraw with translation
@@ -223,7 +139,6 @@ main (int argc, char **argv) {
 
     g_test_add_func("/widgets/view/sanity", test_sanity);
     g_test_add_func("/widgets/view/processing", test_processing);
-    g_test_add_func("/widgets/view/redraw-on-computed", test_redraw_on_computed);
 
     retval = g_test_run();
     gegl_exit();
