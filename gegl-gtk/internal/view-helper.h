@@ -22,7 +22,7 @@
 #include <glib-object.h>
 #include <gegl.h>
 #include <gtk/gtk.h>
-24ea1a60d4497df6cff9828093a8f6b9eed644cf
+
 #include <gegl-gtk-enums.h>
 
 G_BEGIN_DECLS
