@@ -1,6 +1,6 @@
 CLEANFILES = 
 
-gen_sources = gegl-gtk-enums.c
+gen_sources = gegl-gtk-enums.c gegl-gtk-marshal.c gegl-gtk-marshal.h
 CLEANFILES += $(gen_sources)
 
 headers = gegl-gtk.h gegl-gtk-view.h gegl-gtk-enums.h
@@ -19,12 +19,18 @@ gegl-gtk-enums.c: $(srcdir)/gegl-gtk-enums.h
 			   --vtail "	  { 0, NULL, NULL }\n	};\n	etype = g_@type@_register_static (\"@EnumName@\", values);\n  }\n  return etype;\n}\n\n" \
 			   $(srcdir)/gegl-gtk-enums.h > gegl-gtk-enums.c
 
+gegl-gtk-marshal.h: $(srcdir)/gegl-gtk-marshal.list
+	glib-genmarshal --prefix=gegl_gtk_marshal $(srcdir)/gegl-gtk-marshal.list --header >> gegl-gtk-marshal.h
+
+gegl-gtk-marshal.c: gegl-gtk-marshal.h
+	echo "#include \"gegl-gtk-marshal.h\"" >> gegl-gtk-marshal.c \
+	&& glib-genmarshal --prefix=gegl_gtk_marshal $(srcdir)/gegl-gtk-marshal.list --body >> gegl-gtk-marshal.c
 
 gegl_gtk_includedir=$(includedir)/gegl-gtk$(GEGL_GTK_GTK_VERSION)-$(GEGL_GTK_API_VERSION)
 gegl_gtk_include_HEADERS = $(headers)
 
 gegl_gtk_SOURCES = $(headers) $(sources) $(internal_headers) $(internal_sources)
-gegl_gtk_LIBADD  = $(GTK_LIBS) $(GEGL_LIBS)
+gegl_gtk_LIBADD  = $(GTK_LIBS) $(GEGL_LIBS) $(CAIRO_GOBJECT_LIBS)
 gegl_gtk_CFLAGS  = $(INCLUDES) $(CFLAGS)
 
 if HAVE_GTK2

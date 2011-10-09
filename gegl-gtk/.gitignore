@@ -2,3 +2,4 @@
 *.typelib
 *.vapi
 gegl-gtk-enums.c
+gegl-gtk-marshal.*

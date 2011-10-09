@@ -152,6 +152,29 @@ static gboolean paint_release (GtkWidget      *widget,
   return FALSE;
 }
 
+static void
+draw_overlay (GeglGtkView *view, cairo_t *cr, GdkRectangle *rect)
+{
+    cairo_translate (cr, 200.0, 200.0);
+
+	cairo_set_source_rgba (cr, 0.0, 0.0, 0.0, 0.3);
+	cairo_rectangle (cr, 0.0, 0.0, 200.0, 50.0);
+	cairo_fill (cr);
+
+	cairo_set_source_rgba (cr, 0.0, 0.0, 0.0, 0.9);
+    cairo_translate (cr, 20.0, 20.0);
+	cairo_show_text (cr, "canvas overlay");
+	cairo_fill (cr);
+}
+
+static void
+draw_background (GeglGtkView *view, cairo_t *cr, GdkRectangle *rect)
+{
+	cairo_set_source_rgba (cr, 0.9, 0.9, 1.0, 1.0);
+	cairo_rectangle (cr, 0.0, 0.0, rect->width, rect->height);
+	cairo_fill (cr);
+}
+
 gint
 main (gint    argc,
       gchar **argv)
@@ -197,6 +220,12 @@ main (gint    argc,
     gegl_gtk_view_set_autoscale_policy(GEGL_GTK_VIEW(view), GEGL_GTK_VIEW_AUTOSCALE_DISABLED);
     top  = loadbuf;
   }
+
+
+  g_signal_connect (G_OBJECT (view), "draw-overlay",
+                    (GCallback) draw_overlay, NULL); 
+  g_signal_connect (G_OBJECT (view), "draw-background",
+                    (GCallback) draw_background, NULL); 
 
   eventbox = gtk_event_box_new ();
 

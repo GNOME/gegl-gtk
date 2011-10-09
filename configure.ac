@@ -218,6 +218,23 @@ AM_CONDITIONAL(HAVE_GTK3, test "$have_gtk" = "3.0")
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
 
+##################
+# Cairo gobject
+###################
+AC_ARG_WITH(cairo-gobject, [  --without-cairo-gobject    build without Cairo GObject support])
+
+have_cairo_gobject="no"
+if test "x$with_cairo_gobject" != "xno"; then
+  PKG_CHECK_MODULES(CAIRO_GOBJECT, cairo-gobject,
+    [have_cairo_gobject="yes" AC_DEFINE(HAVE_CAIRO_GOBJECT, 1, [Define to 1 to compile for gtk2])],
+    have_cairo_gobject="no  (Cairo GObject not found)")
+fi
+
+AM_CONDITIONAL(HAVE_CAIRO_GOBJECT, test "$have_cairo_gobject" = "yes")
+
+AC_SUBST(CAIRO_GOBJECT_CFLAGS)
+AC_SUBST(CAIRO_GOBJECT_LIBS)
+
 ########################
 # Check GObject Introspection
 ########################
@@ -319,6 +336,7 @@ Building GEGL with prefix=$prefix
 
   GTK+ version:           $have_gtk
   Documentation:          $enable_gtk_doc
+  Cairo GObject: 	  $have_cairo_gobject
   GObject Introspection:  $enable_introspection
   Vala support:           $have_vala
 ]);

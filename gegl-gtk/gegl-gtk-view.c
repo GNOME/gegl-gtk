@@ -22,9 +22,13 @@
 #include <gtk/gtk.h>
 #include <gegl.h>
 
+#ifdef HAVE_CAIRO_GOBJECT
+#include <cairo-gobject.h>
+#endif
+
 #include "gegl-gtk-view.h"
 #include "internal/view-helper.h"
-
+#include "gegl-gtk-marshal.h"
 
 /**
  * This class is responsible for providing the public interface
@@ -50,6 +54,16 @@ enum
   PROP_AUTOSCALE_POLICY
 };
 
+#ifdef HAVE_CAIRO_GOBJECT
+enum
+{
+  SIGNAL_DRAW_BACKGROUND,
+  SIGNAL_DRAW_OVERLAY,
+  N_SIGNALS
+};
+
+static guint gegl_view_signals[N_SIGNALS];
+#endif
 
 static ViewHelper *
 get_private(GeglGtkView *self)
@@ -148,6 +162,28 @@ gegl_gtk_view_class_init (GeglGtkViewClass * klass)
                                                       GEGL_GTK_VIEW_AUTOSCALE_CONTENT,
                                                       G_PARAM_READWRITE |
                                                       G_PARAM_CONSTRUCT));
+
+#ifdef HAVE_CAIRO_GOBJECT
+  gegl_view_signals[SIGNAL_DRAW_BACKGROUND] =
+      g_signal_new ("draw-background",
+      G_TYPE_FROM_CLASS (klass),
+      0,
+      0,
+      NULL,
+      NULL,
+      gegl_gtk_marshal_VOID__BOXED_BOXED,
+      G_TYPE_NONE, 2, CAIRO_GOBJECT_TYPE_CONTEXT, GDK_TYPE_RECTANGLE);
+
+  gegl_view_signals[SIGNAL_DRAW_OVERLAY] =
+      g_signal_new ("draw-overlay",
+      G_TYPE_FROM_CLASS (klass),
+      0,
+      0,
+      NULL,
+      NULL,
+      gegl_gtk_marshal_VOID__BOXED_BOXED,
+      G_TYPE_NONE, 2, CAIRO_GOBJECT_TYPE_CONTEXT, GDK_TYPE_RECTANGLE);
+#endif
 
 }
 
@@ -274,11 +310,38 @@ size_allocate(GtkWidget *widget, GdkRectangle *allocation, gpointer user_data)
     view_helper_set_allocation(GET_PRIVATE(self), allocation);
 }
 
+static void
+draw_implementation(GeglGtkView *self, cairo_t *cr, GdkRectangle *rect)
+{
+  ViewHelper *priv = GET_PRIVATE (self);
+
+#ifdef HAVE_CAIRO_GOBJECT
+  /* Draw background */
+  cairo_save(cr);
+  g_signal_emit(G_OBJECT(self), gegl_view_signals[SIGNAL_DRAW_BACKGROUND], 
+                0, cr, rect, NULL);
+  cairo_restore(cr);
+#endif
+
+  /* Draw the gegl node */
+  cairo_save(cr);
+  view_helper_draw(priv, cr, rect);
+  cairo_restore(cr);
+
+#ifdef HAVE_CAIRO_GOBJECT
+  /* Draw overlay */
+  cairo_save(cr);
+  g_signal_emit(G_OBJECT(self), gegl_view_signals[SIGNAL_DRAW_OVERLAY],
+                0, cr, rect, NULL);
+  cairo_restore(cr);
+#endif
+}
+
 #ifdef HAVE_GTK3
 static gboolean
 draw (GtkWidget * widget, cairo_t *cr)
 {
-  GeglGtkView      *view = GEGL_GTK_VIEW (widget);
+  GeglGtkView *self = GEGL_GTK_VIEW (widget);
   ViewHelper *priv = GET_PRIVATE (view);
   GdkRectangle rect;
 
@@ -286,8 +349,8 @@ draw (GtkWidget * widget, cairo_t *cr)
     return FALSE;
 
   gdk_cairo_get_clip_rectangle (cr, &rect);
-
-  view_helper_draw (priv, cr, &rect);
+  
+  draw_implementation(self, cr, &rect);
 
   return FALSE;
 }
@@ -298,8 +361,8 @@ static gboolean
 expose_event (GtkWidget      *widget,
               GdkEventExpose *event)
 {
-  GeglGtkView      *view = GEGL_GTK_VIEW (widget);
-  ViewHelper *priv = GET_PRIVATE (view);
+  GeglGtkView *self = GEGL_GTK_VIEW (widget);
+  ViewHelper *priv = GET_PRIVATE (self);
   cairo_t      *cr;
   GdkRectangle rect;
 
@@ -311,7 +374,7 @@ expose_event (GtkWidget      *widget,
   cairo_clip (cr);
   gdk_region_get_clipbox (event->region, &rect);
 
-  view_helper_draw (priv, cr, &rect);
+  draw_implementation(self, cr, &rect);
 
   cairo_destroy (cr);
 
