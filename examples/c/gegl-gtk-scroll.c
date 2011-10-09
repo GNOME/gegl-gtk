@@ -45,7 +45,7 @@ main (gint    argc,
   /* Build graph that loads an image */
   graph = gegl_node_new ();
   node = gegl_node_new_child (graph,
-    "operation", "gegl:load", 
+    "operation", "gegl:load",
     "path", argv[1], NULL);
 
   gegl_node_process (node);
@@ -53,20 +53,17 @@ main (gint    argc,
   /* Setup */
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), "GEGL-GTK scrolled example");
-  
-  
+
+
   scrolled = gtk_scrolled_window_new(NULL, NULL);
 
   view = GTK_WIDGET(gegl_gtk_view_new_for_node(node));
 
-  // FIXME: should be possible for the widget to do this automatically, and take changes into account
-  gtk_widget_set_size_request(view, 500, 500);
-  
   gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrolled), view);
-  
+
   gtk_container_add (GTK_CONTAINER (window), scrolled);
 
-  g_signal_connect (window, "destroy", 
+  g_signal_connect (window, "destroy",
                     G_CALLBACK (gtk_main_quit), NULL);
   gtk_widget_show_all (window);
 

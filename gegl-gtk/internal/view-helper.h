@@ -46,7 +46,8 @@ struct _ViewHelper
   gboolean       block;    /* blocking render */
   guint          monitor_id;
   GeglProcessor *processor;
-  GdkRectangle   allocation;
+  GdkRectangle   widget_allocation; /* The allocated size of the widget */
+  GeglRectangle  view_bbox; /* Bounding box of the node, in view coordinates */
 };
 
 struct _ViewHelperClass

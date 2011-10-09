@@ -28,6 +28,7 @@ G_DEFINE_TYPE (ViewHelper, view_helper, G_TYPE_OBJECT)
 enum
 {
   SIGNAL_REDRAW_NEEDED,
+  SIGNAL_SIZE_CHANGED,
   N_SIGNALS
 };
 
@@ -42,9 +43,19 @@ view_helper_class_init (ViewHelperClass * klass)
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
   gobject_class->finalize = finalize;
-    
+
   /* Emitted when a redraw is needed, with the area that needs redrawing. */
   view_helper_signals[SIGNAL_REDRAW_NEEDED] = g_signal_new ("redraw-needed",
+                G_TYPE_FROM_CLASS (klass),
+                G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
+                0,
+                NULL, NULL,
+                g_cclosure_marshal_VOID__BOXED,
+                G_TYPE_NONE, 1,
+                GEGL_TYPE_RECTANGLE);
+
+  /* Emitted when the size of the view changes, with the new size. */
+  view_helper_signals[SIGNAL_SIZE_CHANGED] = g_signal_new ("size-changed",
                 G_TYPE_FROM_CLASS (klass),
                 G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
                 0,
@@ -57,12 +68,18 @@ view_helper_class_init (ViewHelperClass * klass)
 static void
 view_helper_init (ViewHelper *self)
 {
+  GeglRectangle invalid_rect = {0, 0, -1, -1};
+  GdkRectangle invalid_gdkrect = {0, 0, -1, -1};
+
   self->node        = NULL;
   self->x           = 0;
   self->y           = 0;
   self->scale       = 1.0;
   self->monitor_id  = 0;
   self->processor   = NULL;
+
+  self->widget_allocation = invalid_gdkrect;
+  self->view_bbox   = invalid_rect;
 }
 
 static void
@@ -71,7 +88,7 @@ finalize (GObject *gobject)
    ViewHelper *self = VIEW_HELPER(gobject);
 
   if (self->monitor_id)
-    {  
+    {
       g_source_remove (self->monitor_id);
       self->monitor_id = 0;
     }
@@ -81,8 +98,21 @@ finalize (GObject *gobject)
 
   if (self->processor)
     g_object_unref (self->processor);
-}    
+}
 
+/* Transform a rectangle from model to view coordinates. */
+static void
+model_rect_to_view_rect(ViewHelper *self, GeglRectangle *rect)
+{
+  GeglRectangle temp;
+
+  temp.x = self->scale * (rect->x) - rect->x;
+  temp.y = self->scale * (rect->y) - rect->y;
+  temp.width = ceil (self->scale * rect->width);
+  temp.height = ceil (self->scale * rect->height);
+
+  *rect = temp;
+}
 
 static void
 invalidated_event (GeglNode      *node,
@@ -107,18 +137,28 @@ task_monitor (ViewHelper *self)
 
 
 /* When the GeglNode has been computed,
- * find out which area in the view changed and emit the
- * "redraw" signal to notify it that a redraw is needed */
+ * find out if the size of the vie changed and
+ * emit the "size-changed" signal to notify view
+ * find out which area in the view was computed and emit the
+ * "redraw-needed" signal to notify it that a redraw is needed */
 static void
 computed_event (GeglNode      *node,
                 GeglRectangle *rect,
                 ViewHelper    *self)
 {
-  gint x = self->scale * (rect->x) - self->x;
-  gint y = self->scale * (rect->y) - self->y;
-  gint w = ceil (self->scale * rect->width);
-  gint h = ceil (self->scale * rect->height);
-  GeglRectangle redraw_rect = {x, y, w, h};
+  /* Notify about potential size change */
+  GeglRectangle bbox = gegl_node_get_bounding_box(node);
+  model_rect_to_view_rect(self, &bbox);
+
+  if (!gegl_rectangle_equal(&bbox, &(self->view_bbox))) {
+      self->view_bbox = bbox;
+      g_signal_emit (self, view_helper_signals[SIGNAL_SIZE_CHANGED],
+                 0, &bbox, NULL);
+  }
+
+  /* Emit redraw-needed */
+  GeglRectangle redraw_rect = *rect;
+  model_rect_to_view_rect(self, &redraw_rect);
 
   g_signal_emit (self, view_helper_signals[SIGNAL_REDRAW_NEEDED],
 	         0, &redraw_rect, NULL);
@@ -131,9 +171,9 @@ view_helper_new(void)
 }
 
 /* Draw the view of the GeglNode to the provided cairo context,
- * taking into account transformations et.c. 
+ * taking into account transformations et.c.
  * @rect the bounding box of the area to draw in view coordinates
- * 
+ *
  * For instance called by widget during the draw/expose */
 void
 view_helper_draw (ViewHelper *self, cairo_t *cr, GdkRectangle *rect)
@@ -157,9 +197,9 @@ view_helper_draw (ViewHelper *self, cairo_t *cr, GdkRectangle *rect)
                   GEGL_AUTO_ROWSTRIDE,
                   GEGL_BLIT_CACHE | (self->block ? 0 : GEGL_BLIT_DIRTY));
 
-  surface = cairo_image_surface_create_for_data (buf, 
-                                                 CAIRO_FORMAT_ARGB32, 
-                                                 roi.width, roi.height, 
+  surface = cairo_image_surface_create_for_data (buf,
+                                                 CAIRO_FORMAT_ARGB32,
+                                                 roi.width, roi.height,
                                                  roi.width*4);
   cairo_set_source_surface (cr, surface, rect->x, rect->y);
   cairo_paint (cr);
@@ -172,7 +212,7 @@ view_helper_draw (ViewHelper *self, cairo_t *cr, GdkRectangle *rect)
 void
 view_helper_set_allocation(ViewHelper *self, GdkRectangle *allocation)
 {
-    self->allocation = *allocation;
+    self->widget_allocation = *allocation;
     view_helper_repaint(self);
 }
 
@@ -185,8 +225,8 @@ view_helper_repaint (ViewHelper *self)
   roi.x = self->x / self->scale;
   roi.y = self->y / self->scale;
 
-  roi.width = ceil(self->allocation.width / self->scale+1);
-  roi.height = ceil(self->allocation.height / self->scale+1);
+  roi.width = ceil(self->widget_allocation.width / self->scale+1);
+  roi.height = ceil(self->widget_allocation.height / self->scale+1);
 
   if (self->monitor_id == 0)
     {

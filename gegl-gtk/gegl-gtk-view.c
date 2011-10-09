@@ -86,6 +86,8 @@ trigger_redraw(ViewHelper* priv, GeglRectangle *rect, GeglGtkView *view);
 static void
 size_allocate(GtkWidget *widget, GdkRectangle *allocation, gpointer user_data);
 
+static void
+view_size_changed(ViewHelper* priv, GeglRectangle *rect, GeglGtkView *view);
 
 static void
 gegl_gtk_view_class_init (GeglGtkViewClass * klass)
@@ -148,7 +150,8 @@ gegl_gtk_view_init (GeglGtkView *self)
   self->priv = (GeglGtkViewPrivate *)view_helper_new();
 
   g_signal_connect(self->priv, "redraw-needed", G_CALLBACK (trigger_redraw), (gpointer)self);
-  
+  g_signal_connect(self->priv, "size-changed", G_CALLBACK (view_size_changed), (gpointer)self);
+
   g_signal_connect(self, "size-allocate", G_CALLBACK (size_allocate), NULL);
 }
 
@@ -233,11 +236,22 @@ trigger_redraw (ViewHelper *priv,
               GeglRectangle *rect,
               GeglGtkView *view)
 {
-    if (rect->width < 0 || rect->height < 0) 
+    if (rect->width < 0 || rect->height < 0)
         gtk_widget_queue_draw(GTK_WIDGET(view));
     else
         gtk_widget_queue_draw_area(GTK_WIDGET(view),
 			      rect->x, rect->y, rect->width, rect->height);
+}
+
+/* Bounding box of the node view changed */
+static void
+view_size_changed(ViewHelper* priv, GeglRectangle *rect, GeglGtkView *view)
+{
+    /* Resize the widget to fit the entire view bounding box
+     * TODO: implement a policy for this
+     * consumers should be able to have the view not autoscale at all
+     * or to have it autoscale the content to fit the size of widget */
+    gtk_widget_set_size_request(GTK_WIDGET(view), rect->width, rect->height);
 }
 
 static void
@@ -287,7 +301,7 @@ expose_event (GtkWidget      *widget,
   gdk_region_get_clipbox (event->region, &rect);
 
   view_helper_draw (priv, cr, &rect);
-  
+
   cairo_destroy (cr);
 
   view_helper_repaint (priv); /* Only needed due to possible allocation changes? */
