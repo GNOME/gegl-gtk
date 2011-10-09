@@ -79,6 +79,8 @@ float view_helper_get_x(ViewHelper *self);
 void view_helper_set_y(ViewHelper *self, float y);
 float view_helper_get_y(ViewHelper *self);
 
+void view_helper_get_transformation(ViewHelper *self, GeglMatrix3 *matrix);
+
 void view_helper_set_autoscale_policy(ViewHelper *self, GeglGtkViewAutoscale autoscale);
 GeglGtkViewAutoscale view_helper_get_autoscale_policy(ViewHelper *self);
 

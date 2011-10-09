@@ -354,6 +354,43 @@ view_helper_get_y(ViewHelper *self)
     return self->y;
 }
 
+void view_helper_get_transformation(ViewHelper *self, GeglMatrix3 *matrix)
+{
+    /* XXX: Below gives the right result, but is it really the
+     * way we want transformations to work? */
+
+    /* API change in GEGL 1.7 (1.6+git):
+     * GeglMatrix3 changed from float[3][3] to
+     * struct with a float[3][3] coeff member */
+
+#if GEGL_MINOR_VERSION == 1 && GEGL_MICRO_VERSION >= 7
+    matrix->coeff [0][0] = self->scale; /* xx */
+    matrix->coeff [0][1] = 0.0; /* xy */
+    matrix->coeff [0][2] = -self->x; /* x0 */
+
+    matrix->coeff [1][0] = 0.0; /* yx */
+    matrix->coeff [1][1] = self->scale; /* yy */
+    matrix->coeff [1][2] = -self->y; /* y0 */
+
+    matrix->coeff [2][0] = 0.0;
+    matrix->coeff [2][1] = 0.0;
+    matrix->coeff [2][2] = 1.0;
+#else
+    matrix [0][0] = self->scale;
+    matrix [0][1] = 0.0;
+    matrix [0][2] = -self->x;
+
+    matrix [1][0] = 0.0;
+    matrix [1][1] = self->scale;
+    matrix [1][2] = -self->y;
+
+    matrix [2][0] = 0.0;
+    matrix [2][1] = 0.0;
+    matrix [2][2] = 1.0;
+#endif
+
+}
+
 void
 view_helper_set_autoscale_policy(ViewHelper *self, GeglGtkViewAutoscale autoscale)
 {

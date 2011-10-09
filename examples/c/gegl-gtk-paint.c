@@ -39,10 +39,31 @@ static GeglPath   *vector   = NULL;
 static GeglNode   *over     = NULL;
 static GeglNode   *stroke   = NULL;
 
+/* Transform the input coordinate from view coordinates to model coordinates
++ * Returns TRUE if the transformation was successfull, else FALSE */
+gboolean
+transform_view_to_model_coordinate (gdouble *x, gdouble *y)
+{
+  GeglMatrix3 matrix;
+  gegl_gtk_view_get_transformation (GEGL_GTK_VIEW (view), &matrix);
+
+  if (gegl_matrix3_determinant (&matrix) == 0.0) {
+    return FALSE;
+  }
+
+  gegl_matrix3_invert (&matrix);
+  gegl_matrix3_transform_point (&matrix, x, y);
+
+  return TRUE;
+}
 
 static gboolean paint_press (GtkWidget      *widget,
                              GdkEventButton *event)
 {
+  gdouble x = event->x;
+  gdouble y = event->y;
+  transform_view_to_model_coordinate (&x, &y);
+
   if (event->button == 1)
     {
       vector     = gegl_path_new ();
@@ -57,7 +78,7 @@ static gboolean paint_press (GtkWidget      *widget,
                                         NULL);
       gegl_node_link_many (top, over, out, NULL);
       gegl_node_connect_to (stroke, "output", over, "aux");
-      gegl_path_append (vector, 'M', event->x, event->y);
+      gegl_path_append (vector, 'M', x, y);
 
       pen_down = TRUE;
 
@@ -70,6 +91,11 @@ static gboolean paint_press (GtkWidget      *widget,
 static gboolean paint_motion (GtkWidget      *widget,
                               GdkEventMotion *event)
 {
+  gdouble x = event->x;
+  gdouble y = event->y;
+
+  transform_view_to_model_coordinate (&x, &y);
+
   if (event->state & GDK_BUTTON1_MASK)
     {
       if (!pen_down)
@@ -77,7 +103,7 @@ static gboolean paint_motion (GtkWidget      *widget,
           return TRUE;
         }
 
-      gegl_path_append (vector, 'L', event->x, event->y);
+      gegl_path_append (vector, 'L', x, y);
       return TRUE;
     }
   return FALSE;
@@ -166,6 +192,9 @@ main (gint    argc,
     gegl_node_link_many (loadbuf, out, NULL);
 
     view = GTK_WIDGET(gegl_gtk_view_new_for_node(out));
+    gegl_gtk_view_set_x(GEGL_GTK_VIEW(view), -50.0);
+    gegl_gtk_view_set_y(GEGL_GTK_VIEW(view), -50.0);
+    gegl_gtk_view_set_autoscale_policy(GEGL_GTK_VIEW(view), GEGL_GTK_VIEW_AUTOSCALE_DISABLED);
     top  = loadbuf;
   }
 

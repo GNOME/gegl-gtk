@@ -69,6 +69,8 @@ float gegl_gtk_view_get_x(GeglGtkView *self);
 void gegl_gtk_view_set_y(GeglGtkView *self, float y);
 float gegl_gtk_view_get_y(GeglGtkView *self);
 
+void gegl_gtk_view_get_transformation(GeglGtkView *self, GeglMatrix3 *matrix);
+
 void gegl_gtk_view_set_autoscale_policy(GeglGtkView *self, GeglGtkViewAutoscale autoscale);
 GeglGtkViewAutoscale gegl_gtk_view_get_autoscale_policy(GeglGtkView *self);
 

@@ -388,6 +388,21 @@ gegl_gtk_view_get_y(GeglGtkView *self)
     return view_helper_get_y(GET_PRIVATE(self));
 }
 
+/**
+ * gegl_gtk_view_get_transformation: Get the model->view transformation
+ * @self: A #GeglGtkView
+ * @matrix: (out caller-allocates): Pointer to location for transformation matrix
+ *
+ * The transformation matrix describes the transformation between the
+ * model (the output of the GeglNode) and the view (the display in the widget).
+ * To transform coordinates use gegl_matrix3_transform_point().
+ * To get a matrix representing the view->model space transformation, use gegl_matrix3_invert()
+ */
+void gegl_gtk_view_get_transformation(GeglGtkView *self, GeglMatrix3 *matrix)
+{
+    view_helper_get_transformation(GET_PRIVATE(self), matrix);
+}
+
 void
 gegl_gtk_view_set_autoscale_policy(GeglGtkView *self, GeglGtkViewAutoscale autoscale)
 {
