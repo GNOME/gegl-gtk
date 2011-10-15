@@ -1,14 +1,26 @@
 CLEANFILES = 
 
-gen_sources = gegl-gtk-enums.c gegl-gtk-marshal.c gegl-gtk-marshal.h
-CLEANFILES += $(gen_sources)
+gen_sources = gegl-gtk-enums.c gegl-gtk-marshal.c
+gen_headers = gegl-gtk-enums.h gegl-gtk-marshal.h
+CLEANFILES += $(gen_sources) $(gen_headers)
+BUILT_SOURCES = $(gen_headers)
 
-headers = gegl-gtk.h gegl-gtk-view.h gegl-gtk-enums.h
+headers = gegl-gtk.h gegl-gtk-view.h
 sources = gegl-gtk-view.c $(gen_sources)
 INCLUDES = $(GTK_CFLAGS) $(GEGL_CFLAGS)
 
 internal_headers = internal/view-helper.h
 internal_sources = internal/view-helper.c
+
+gegl_gtk_includedir=$(includedir)/gegl-gtk$(GEGL_GTK_GTK_VERSION)-$(GEGL_GTK_API_VERSION)
+gegl_gtk_include_HEADERS = $(headers)
+
+lib_LTLIBRARIES = libgegl-gtk@GEGL_GTK_GTK_VERSION@-0.1.la
+
+libgegl_gtk@GEGL_GTK_GTK_VERSION@_0_1_la_SOURCES = $(headers)  $(gen_headers) $(sources) $(internal_headers) $(internal_sources)
+libgegl_gtk@GEGL_GTK_GTK_VERSION@_0_1_la_LIBADD = $(GTK_LIBS) $(GEGL_LIBS) $(CAIRO_GOBJECT_LIBS)
+libgegl_gtk@GEGL_GTK_GTK_VERSION@_0_1_la_CFLAGS = $(INCLUDES) $(CFLAGS)
+libgegl_gtk@GEGL_GTK_GTK_VERSION@_0_1_la_LDFLAGS = $(gegl_gtk_LDFLAGS) -version-info $(GEGL_GTK_LIBRARY_VERSION)
 
 gegl-gtk-enums.c: $(srcdir)/gegl-gtk-enums.h
 	glib-mkenums \
@@ -26,27 +38,6 @@ gegl-gtk-marshal.c: gegl-gtk-marshal.h
 	echo "#include \"gegl-gtk-marshal.h\"" >> gegl-gtk-marshal.c \
 	&& glib-genmarshal --prefix=gegl_gtk_marshal $(srcdir)/gegl-gtk-marshal.list --body >> gegl-gtk-marshal.c
 
-gegl_gtk_includedir=$(includedir)/gegl-gtk$(GEGL_GTK_GTK_VERSION)-$(GEGL_GTK_API_VERSION)
-gegl_gtk_include_HEADERS = $(headers)
-
-gegl_gtk_SOURCES = $(headers) $(sources) $(internal_headers) $(internal_sources)
-gegl_gtk_LIBADD  = $(GTK_LIBS) $(GEGL_LIBS) $(CAIRO_GOBJECT_LIBS)
-gegl_gtk_CFLAGS  = $(INCLUDES) $(CFLAGS)
-
-if HAVE_GTK2
-lib_LTLIBRARIES = libgegl-gtk2-0.1.la
-libgegl_gtk2_0_1_la_LIBADD = $(gegl_gtk_LIBADD)
-libgegl_gtk2_0_1_la_CFLAGS = $(gegl_gtk_CFLAGS)
-libgegl_gtk2_0_1_la_LDFLAGS = $(gegl_gtk_LDFLAGS) -version-info $(GEGL_GTK_LIBRARY_VERSION)
-libgegl_gtk2_0_1_la_SOURCES = $(gegl_gtk_SOURCES)
-else
-lib_LTLIBRARIES = libgegl-gtk3-0.1.la
-libgegl_gtk3_0_1_la_LIBADD = $(gegl_gtk_LIBADD)
-libgegl_gtk3_0_1_la_CFLAGS = $(gegl_gtk_CFLAGS)
-libgegl_gtk3_0_1_la_LDFLAGS = $(gegl_gtk_LDFLAGS) -version-info $(GEGL_GTK_LIBRARY_VERSION)
-libgegl_gtk3_0_1_la_SOURCES = $(gegl_gtk_SOURCES)
-endif
-
 ### GObject introspection
 -include $(INTROSPECTION_MAKEFILE)
 
@@ -62,11 +53,7 @@ GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_CFLAGS = $(INCLUDES)
 GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_FILES = $(sources) $(headers)
 GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_LIBS = libgegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.la
 
-if HAVE_GTK2
-GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_INCLUDES = Gtk-2.0 Gegl-0.1 Babl-0.1
-else
-GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_INCLUDES = Gtk-3.0 Gegl-0.1 Babl-0.1
-endif
+GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_INCLUDES = Gtk-@GEGL_GTK_GTK_VERSION@.0 Gegl-0.1 Babl-0.1
 
 INTROSPECTION_GIRS += GeglGtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.gir
 
