@@ -24,55 +24,55 @@
 #include <gegl-gtk.h>
 
 gint
-main (gint    argc,
-      gchar **argv)
+main(gint    argc,
+     gchar **argv)
 {
-  GtkWidget *window = NULL;
-  GtkWidget *view = NULL;
-  GtkWidget *scrolled = NULL;
-  GeglNode *graph = NULL;
-  GeglNode *node = NULL;
+    GtkWidget *window = NULL;
+    GtkWidget *view = NULL;
+    GtkWidget *scrolled = NULL;
+    GeglNode *graph = NULL;
+    GeglNode *node = NULL;
 
-  g_thread_init (NULL);
-  gtk_init (&argc, &argv);
-  gegl_init (&argc, &argv);
+    g_thread_init(NULL);
+    gtk_init(&argc, &argv);
+    gegl_init(&argc, &argv);
 
-  if (argc != 2) {
-    g_print ("Usage: %s <FILENAME>\n", argv[0]);
-    exit(1);
-  }
+    if (argc != 2) {
+        g_print("Usage: %s <FILENAME>\n", argv[0]);
+        exit(1);
+    }
 
-  /* Build graph that loads an image */
-  graph = gegl_node_new ();
-  node = gegl_node_new_child (graph,
-    "operation", "gegl:load",
-    "path", argv[1], NULL);
+    /* Build graph that loads an image */
+    graph = gegl_node_new();
+    node = gegl_node_new_child(graph,
+                               "operation", "gegl:load",
+                               "path", argv[1], NULL);
 
-  gegl_node_process (node);
+    gegl_node_process(node);
 
-  /* Setup */
-  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (window), "GEGL-GTK scrolled example");
+    /* Setup */
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "GEGL-GTK scrolled example");
 
 
-  scrolled = gtk_scrolled_window_new(NULL, NULL);
+    scrolled = gtk_scrolled_window_new(NULL, NULL);
 
-  view = GTK_WIDGET(gegl_gtk_view_new_for_node(node));
-  gegl_gtk_view_set_autoscale_policy(GEGL_GTK_VIEW(view), GEGL_GTK_VIEW_AUTOSCALE_WIDGET);
+    view = GTK_WIDGET(gegl_gtk_view_new_for_node(node));
+    gegl_gtk_view_set_autoscale_policy(GEGL_GTK_VIEW(view), GEGL_GTK_VIEW_AUTOSCALE_WIDGET);
 
-  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrolled), view);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrolled), view);
 
-  gtk_container_add (GTK_CONTAINER (window), scrolled);
+    gtk_container_add(GTK_CONTAINER(window), scrolled);
 
-  g_signal_connect (window, "destroy",
-                    G_CALLBACK (gtk_main_quit), NULL);
-  gtk_widget_show_all (window);
+    g_signal_connect(window, "destroy",
+                     G_CALLBACK(gtk_main_quit), NULL);
+    gtk_widget_show_all(window);
 
-  /* Run */
-  gtk_main ();
+    /* Run */
+    gtk_main();
 
-  /* Cleanup */
-  g_object_unref (graph);
-  gegl_exit ();
-  return 0;
+    /* Cleanup */
+    g_object_unref(graph);
+    gegl_exit();
+    return 0;
 }

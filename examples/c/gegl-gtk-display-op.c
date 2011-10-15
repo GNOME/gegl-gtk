@@ -22,40 +22,40 @@
 #include <gegl.h>
 
 gint
-main (gint    argc,
-      gchar **argv)
+main(gint    argc,
+     gchar **argv)
 {
-  GeglNode *graph = NULL;
-  GeglNode *node = NULL;
-  GeglNode *display = NULL;
+    GeglNode *graph = NULL;
+    GeglNode *node = NULL;
+    GeglNode *display = NULL;
 
-  g_thread_init (NULL);
-  gegl_init (&argc, &argv);
+    g_thread_init(NULL);
+    gegl_init(&argc, &argv);
 
-  if (argc != 2) {
-    g_print ("Usage: %s <FILENAME>\n", argv[0]);
-    exit(1);
-  }
+    if (argc != 2) {
+        g_print("Usage: %s <FILENAME>\n", argv[0]);
+        exit(1);
+    }
 
-  /* Build graph that loads an image */
-  graph = gegl_node_new ();
-  node = gegl_node_new_child (graph,
-    "operation", "gegl:load",
-    "path", argv[1], NULL);
-  display = gegl_node_new_child (graph,
-    "operation", "gegl-gtk2:display", NULL);
-  gegl_node_link_many (node, display, NULL);
+    /* Build graph that loads an image */
+    graph = gegl_node_new();
+    node = gegl_node_new_child(graph,
+                               "operation", "gegl:load",
+                               "path", argv[1], NULL);
+    display = gegl_node_new_child(graph,
+                                  "operation", "gegl-gtk2:display", NULL);
+    gegl_node_link_many(node, display, NULL);
 
-  gegl_node_process (display);
+    gegl_node_process(display);
 
-  /* FIXME: operation must spin the gtk mainloop itself */
-  while (gtk_events_pending ())
-    gtk_main_iteration ();
+    /* FIXME: operation must spin the gtk mainloop itself */
+    while (gtk_events_pending())
+        gtk_main_iteration();
 
-  sleep (2);
+    sleep(2);
 
-  /* Cleanup */
-  g_object_unref (graph);
-  gegl_exit ();
-  return 0;
+    /* Cleanup */
+    g_object_unref(graph);
+    gegl_exit();
+    return 0;
 }

@@ -22,12 +22,12 @@
 G_BEGIN_DECLS
 
 typedef enum {
-  GEGL_GTK_VIEW_AUTOSCALE_DISABLED = 0,
-  GEGL_GTK_VIEW_AUTOSCALE_WIDGET,
-  GEGL_GTK_VIEW_AUTOSCALE_CONTENT
+    GEGL_GTK_VIEW_AUTOSCALE_DISABLED = 0,
+    GEGL_GTK_VIEW_AUTOSCALE_WIDGET,
+    GEGL_GTK_VIEW_AUTOSCALE_CONTENT
 } GeglGtkViewAutoscale;
 
-GType gegl_gtk_view_autoscale_get_type   (void) G_GNUC_CONST;
+GType gegl_gtk_view_autoscale_get_type(void) G_GNUC_CONST;
 #define GEGL_GTK_TYPE_VIEW_AUTOSCALE (gegl_gtk_view_autoscale_get_type())
 
 G_END_DECLS

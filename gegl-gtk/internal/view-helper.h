@@ -37,29 +37,27 @@ G_BEGIN_DECLS
 typedef struct _ViewHelper        ViewHelper;
 typedef struct _ViewHelperClass   ViewHelperClass;
 
-struct _ViewHelper
-{
-  GObject parent_instance;
+struct _ViewHelper {
+    GObject parent_instance;
 
-  GeglNode      *node;
-  gfloat         x;
-  gfloat         y;
-  gdouble        scale;
-  gboolean       block;    /* blocking render */
-  GeglGtkViewAutoscale autoscale_policy;
+    GeglNode      *node;
+    gfloat         x;
+    gfloat         y;
+    gdouble        scale;
+    gboolean       block;    /* blocking render */
+    GeglGtkViewAutoscale autoscale_policy;
 
-  guint          monitor_id;
-  GeglProcessor *processor;
-  GdkRectangle   widget_allocation; /* The allocated size of the widget */
+    guint          monitor_id;
+    GeglProcessor *processor;
+    GdkRectangle   widget_allocation; /* The allocated size of the widget */
 };
 
-struct _ViewHelperClass
-{
-  GObjectClass parent_class;
+struct _ViewHelperClass {
+    GObjectClass parent_class;
 };
 
 
-GType view_helper_get_type      (void) G_GNUC_CONST;
+GType view_helper_get_type(void) G_GNUC_CONST;
 
 ViewHelper *view_helper_new(void);
 void view_helper_node_changed(ViewHelper *self);
