@@ -46,30 +46,25 @@ First release. Goal: minimally useful, solid interfaces.
 Should at happen before or together with the next Gegl release.
 Need to build and work with whatever is the latest Gegl release.
 
-* Sanitize coding style
 * API review, check naming
 * Complete API documentation
 * Simple examples for all provided features
-
-* Register display operation in a generic way with GEGL (needs work in GEGL)
-* Display operation needs to spin its own mainloop
+* Add support for autocentering
 
 * Test bindings. At least using Python and Vala (maybe JavaScript)
 
 (hopefully, can be punted)
-* Add API for getting model->view transformation matrix
-* Add add support for autoscaling and autocentering
-* Add signals for drawing widget background and overlay
 * Tests for transformations
+* Register display operation in a generic way with GEGL (needs work in GEGL)
+* Display operation needs to spin its own mainloop
 
 === Later ===
 General
 * Write a Gegl based GdkPixbuf loader plugin
-* API documentation build
 
 GeglView
 * Add rotation support
+* Performance optimizations
 
 == BUGS ==
-* On first redraw of GeglGtkView, there is sometimes a segfault inside babl:
-babl-fish-reference.c:290 process_same_model()
+* gegl-gtk-paint often does not update correctly on paint strokes
