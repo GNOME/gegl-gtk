@@ -1,11 +1,11 @@
 CLEANFILES = 
 
 gen_sources = gegl-gtk-enums.c gegl-gtk-marshal.c
-gen_headers = gegl-gtk-enums.h gegl-gtk-marshal.h
+gen_headers = gegl-gtk-marshal.h
 CLEANFILES += $(gen_sources) $(gen_headers)
 BUILT_SOURCES = $(gen_headers)
 
-headers = gegl-gtk.h gegl-gtk-view.h
+headers = gegl-gtk.h gegl-gtk-view.h gegl-gtk-enums.h
 sources = gegl-gtk-view.c $(gen_sources)
 INCLUDES = $(GTK_CFLAGS) $(GEGL_CFLAGS)
 
