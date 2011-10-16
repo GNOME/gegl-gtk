@@ -338,7 +338,7 @@ static gboolean
 draw(GtkWidget *widget, cairo_t *cr)
 {
     GeglGtkView *self = GEGL_GTK_VIEW(widget);
-    ViewHelper *priv = GET_PRIVATE(view);
+    ViewHelper *priv = GET_PRIVATE(self);
     GdkRectangle rect;
 
     if (!priv->node)
