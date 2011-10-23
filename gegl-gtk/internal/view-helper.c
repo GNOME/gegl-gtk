@@ -292,6 +292,7 @@ view_helper_set_node(ViewHelper *self, GeglNode *node)
                                 G_CALLBACK(invalidated_event),
                                 self, 0);
 
+        update_autoscale(self);
         invalidate(self);
 
     } else
@@ -311,6 +312,7 @@ view_helper_set_scale(ViewHelper *self, float scale)
         return;
 
     self->scale = scale;
+    update_autoscale(self);
     invalidate(self);
 }
 
@@ -327,6 +329,7 @@ view_helper_set_x(ViewHelper *self, float x)
         return;
 
     self->x = x;
+    update_autoscale(self);
     invalidate(self);
 }
 
@@ -343,6 +346,7 @@ view_helper_set_y(ViewHelper *self, float y)
         return;
 
     self->y = y;
+    update_autoscale(self);
     invalidate(self);
 }
 
