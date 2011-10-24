@@ -326,6 +326,7 @@ examples/Makefile
 examples/c/Makefile
 tests/Makefile
 docs/reference/Makefile
+docs/reference/gegl-gtk-docs.xml
 gegl-gtk2-0.1.pc
 gegl-gtk3-0.1.pc
 ])

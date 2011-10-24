@@ -21,6 +21,14 @@
 
 G_BEGIN_DECLS
 
+/**
+ * GeglGtkViewAutoscale:
+ * @GEGL_GTK_VIEW_AUTOSCALE_DISABLED: Do not autoscale
+ * @GEGL_GTK_VIEW_AUTOSCALE_WIDGET: Automatically scale the widget size
+ * @GEGL_GTK_VIEW_AUTOSCALE_CONTENT: Automatically scale content to fit widget
+ *
+ * Specifies the autoscaling behavior of #GeglGtkView.
+ **/
 typedef enum {
     GEGL_GTK_VIEW_AUTOSCALE_DISABLED = 0,
     GEGL_GTK_VIEW_AUTOSCALE_WIDGET,

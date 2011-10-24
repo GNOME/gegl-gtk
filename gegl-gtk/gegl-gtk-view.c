@@ -31,6 +31,37 @@
 #include "gegl-gtk-marshal.h"
 
 /**
+ * SECTION:gegl-gtk-view
+ * @short_description: Widget for displaying a #GeglNode
+ * @stability: Unstable
+ * @include: gegl-gtk.h
+ *
+ * The view widget displays the output of a node in a GEGL graph.
+ * It will tracks changes in the node, and will therefore automatically
+ * show the correct content when the GEGL graph is changed.
+ *
+ * For setting which #GeglNode to display, use gegl_gtk_view_set_node(),
+ * or use the gegl_gtk_view_new_for_node() convenience constructor.
+ *
+ * Transformations:
+ *
+ * The widget can show a transformed view of the GeglNode. Scaling and
+ * transformations are supported, as well as autoscaling.
+ * For manual control over the transformation see
+ * methods gegl_gtk_view_set_scale(), gegl_gtk_view_set_x() and
+ * gegl_gtk_view_set_y(), or use the corresponding properties.
+ * For changing the autoscaling behavior, see
+ * gegl_gtk_view_set_autoscale_policy()
+ * For getting the effective affine transformation applied, use
+ * gegl_gtk_view_get_transformation()
+ *
+ * Examples:
+ *
+ * In the GEGL-GTK example directories, you can find code examples for
+ * how to use #GeglGtkView in files with names starting with gegl-gtk-view
+ **/
+
+/*
  * This class is responsible for providing the public interface
  * consumers expect of the view widget, and for rendering onto the widget.
  * Tracking changes in the GeglNode, dealing with model<->view transformations
@@ -41,7 +72,12 @@
  * a widget and rely on the presence and behaviour of a windowing system.
  */
 
+/*
+ * TODO: Emit a transformation-changed signal whenever the tranformation changes
+ */
+
 G_DEFINE_TYPE(GeglGtkView, gegl_gtk_view, GTK_TYPE_DRAWING_AREA)
+
 
 enum {
     PROP_0,
@@ -155,12 +191,45 @@ gegl_gtk_view_class_init(GeglGtkViewClass *klass)
                                             FALSE,
                                             G_PARAM_READWRITE));
     g_object_class_install_property(gobject_class, PROP_AUTOSCALE_POLICY,
-                                    g_param_spec_enum("autoscale-policy", NULL, NULL,
+                                    g_param_spec_enum("autoscale-policy",
+                                            "Autoscale policy", "The autoscaling behavior used",
                                             GEGL_GTK_TYPE_VIEW_AUTOSCALE,
                                             GEGL_GTK_VIEW_AUTOSCALE_CONTENT,
                                             G_PARAM_READWRITE |
                                             G_PARAM_CONSTRUCT));
 
+
+/* XXX: maybe we should just allow a second GeglNode to be specified for background? */
+
+/**
+ * GeglGtkView::draw-background:
+ * @widget: the #GeglGtkView widget that emitted the signal
+ * @cr: the #CairoContext to render to
+ * @rect: the area that was updated, view coordinates
+ *
+ * Emitted during painting, before the node contents has been rendered.
+ * Allows consumers to draw a custom background for the widget.
+ *
+ * Note:
+ * Manipulating the view widget in the signal handler is not supported.
+ * This signal is only available if GEGL-GTK was build with Cairo GObject support.
+ **/
+
+/**
+* GeglGtkView::draw-overlay:
+* @widget: the #GeglGtkView widget that emitted the signal
+* @cr: the #CairoContext to render to
+* @rect: the area that was updated, in view coordinates
+*
+* Emitted during painting, before the node contents has been rendered.
+*
+* Allows consumers to draw an overlay for the widget, for instance
+* for simple user interface elements.
+*
+* Note:
+* Manipulating the view widget in the signal handler is not supported.
+* This signal is only available if GEGL-GTK was build with Cairo GObject support.
+**/
 #ifdef HAVE_CAIRO_GOBJECT
     gegl_view_signals[SIGNAL_DRAW_BACKGROUND] =
         g_signal_new("draw-background",
@@ -379,12 +448,27 @@ expose_event(GtkWidget      *widget,
 #endif
 
 
+/**
+ * gegl_gtk_view_new:
+ *
+ * Create a new #GeglGtkView
+ *
+ * Returns: New #GeglGtkView
+ **/
 GeglGtkView *
 gegl_gtk_view_new()
 {
     return GEGL_GTK_VIEW(g_object_new(GEGL_GTK_TYPE_VIEW, NULL));
 }
 
+/**
+ * gegl_gtk_view_new_for_node:
+ * @node: The #GeglNode to display
+ *
+ * Create a new #GeglGtkView for a given #GeglNode
+ *
+ * Returns: New #GeglGtkView displaying @node
+ **/
 GeglGtkView *
 gegl_gtk_view_new_for_node(GeglNode *node)
 {
@@ -393,7 +477,13 @@ gegl_gtk_view_new_for_node(GeglNode *node)
     return view;
 }
 
-
+/**
+ * gegl_gtk_view_set_node:
+ * @self: A #GeglGtkView
+ * @node: (transfer full)(allow-none): a #GeglNode instance or %NULL
+ *
+ * Change the #GeglNode to display
+ **/
 void
 gegl_gtk_view_set_node(GeglGtkView *self, GeglNode *node)
 {
@@ -402,45 +492,92 @@ gegl_gtk_view_set_node(GeglGtkView *self, GeglNode *node)
 
 /**
  * gegl_gtk_view_get_node:
- *
+ * @self: A #GeglGtkView
  * Returns: (transfer none): The #GeglNode this widget displays
- */
+ *
+ * Get the displayed #GeglNode
+ **/
 GeglNode *
 gegl_gtk_view_get_node(GeglGtkView *self)
 {
     return view_helper_get_node(GET_PRIVATE(self));
 }
 
+/**
+ * gegl_gtk_view_set_scale:
+ * @self: A #GeglGtkView
+ * @scale:
+ *
+ * Setter for the :scale property
+ **/
 void
 gegl_gtk_view_set_scale(GeglGtkView *self, float scale)
 {
     view_helper_set_scale(GET_PRIVATE(self), scale);
 }
 
+/**
+ * gegl_gtk_view_get_scale:
+ * @self: A #GeglGtkView
+ *
+ * Getter for the :scale property
+ *
+ * Returns:
+ **/
 float
 gegl_gtk_view_get_scale(GeglGtkView *self)
 {
     return view_helper_get_scale(GET_PRIVATE(self));
 }
 
+/**
+ * gegl_gtk_view_set_x:
+ * @self: A #GeglGtkView
+ * @x:
+ *
+ * Setter for the :x property
+ **/
 void
 gegl_gtk_view_set_x(GeglGtkView *self, float x)
 {
     view_helper_set_x(GET_PRIVATE(self), x);
 }
 
+/**
+ * gegl_gtk_view_get_x:
+ * @self: A #GeglGtkView
+ *
+ * Getter for the :x property
+ *
+ * Returns:
+ **/
 float
 gegl_gtk_view_get_x(GeglGtkView *self)
 {
     return view_helper_get_x(GET_PRIVATE(self));
 }
 
+/**
+ * gegl_gtk_view_set_y:
+ * @self: A #GeglGtkView
+ * @y:
+ *
+ * Setter for the :y property
+ **/
 void
 gegl_gtk_view_set_y(GeglGtkView *self, float y)
 {
     view_helper_set_y(GET_PRIVATE(self), y);
 }
 
+/**
+ * gegl_gtk_view_get_y:
+ * @self: A #GeglGtkView
+ *
+ * Getter for the :y property
+ *
+ * Returns:
+ **/
 float
 gegl_gtk_view_get_y(GeglGtkView *self)
 {
@@ -448,26 +585,43 @@ gegl_gtk_view_get_y(GeglGtkView *self)
 }
 
 /**
- * gegl_gtk_view_get_transformation: Get the model->view transformation
+ * gegl_gtk_view_get_transformation:
  * @self: A #GeglGtkView
  * @matrix: (out caller-allocates): Pointer to location for transformation matrix
+ *
+ * Get the model->view transformation
  *
  * The transformation matrix describes the transformation between the
  * model (the output of the GeglNode) and the view (the display in the widget).
  * To transform coordinates use gegl_matrix3_transform_point().
  * To get a matrix representing the view->model space transformation, use gegl_matrix3_invert()
- */
+ **/
 void gegl_gtk_view_get_transformation(GeglGtkView *self, GeglMatrix3 *matrix)
 {
     view_helper_get_transformation(GET_PRIVATE(self), matrix);
 }
 
+/**
+ * gegl_gtk_view_set_autoscale_policy:
+ * @self: A #GeglGtkView
+ * @autoscale: #GeglGtkViewAutoscale policy to use
+ *
+ * Set the autoscaling policy
+ **/
 void
 gegl_gtk_view_set_autoscale_policy(GeglGtkView *self, GeglGtkViewAutoscale autoscale)
 {
     view_helper_set_autoscale_policy(GET_PRIVATE(self), autoscale);
 }
 
+/**
+ * gegl_gtk_view_get_autoscale_policy:
+ * @self: A #GeglGtkView
+ *
+ * Get the autoscaling policy
+ *
+ * Returns: Current #GeglGtkViewAutoscale policy in use
+ **/
 GeglGtkViewAutoscale
 gegl_gtk_view_get_autoscale_policy(GeglGtkView *self)
 {
