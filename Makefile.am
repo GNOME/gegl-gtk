@@ -17,8 +17,8 @@ pkgconfig_DATA = gegl-gtk3-0.1.pc
 endif
 
 EXTRA_DIST = \
-	$(built_dist_files) \
 	autogen.sh \
+	docs/reference/gegl-gtk-docs.xml.in \
 	docs/gtk-doc.make \
 	gegl-gtk2-0.1.pc.in \
 	gegl-gtk3-0.1.pc.in \
@@ -26,8 +26,7 @@ EXTRA_DIST = \
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-introspection --enable-gtk-doc
 
-DISTCLEANFILES = \
-	$(built_dist_files)
+DISTCLEANFILES =
 
 # Documentation
 gtkdoc_builddir=$(top_builddir)/docs/reference/
