@@ -118,6 +118,9 @@ dnl ==========================================================================
 AM_INIT_AUTOMAKE(no-define no-dist-gzip foreign)
 AM_CONFIG_HEADER(config.h)
 
+GEGL_GTK_SERVER=www.gegl.org
+AC_SUBST(GEGL_GTK_SERVER)
+
 dnl Initialize libtool
 AC_LIBTOOL_DLOPEN
 AC_PROG_CC

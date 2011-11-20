@@ -5,7 +5,7 @@ Maintainer: Jon Nordby <jononor@gmail.com>
 Homepage: http://www.gegl.org
 Code: http://git.gnome.org/browse/gegl-gtk/
 Bugtracker: http://bugs.gnome.org, product GEGL, component gegl-gtk
-Mailinglist: http://blog.gmane.org/gmane.comp.video.gegl.devel
+Mailinglist: http://mail.gnome.org/mailman/listinfo/gegl-developer-list
 
 == Installing ==
 gegl-gtk uses an autotools build system. To install do:
