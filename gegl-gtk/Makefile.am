@@ -1,4 +1,5 @@
 CLEANFILES = 
+EXTRA_DIST =
 
 gen_sources = gegl-gtk-enums.c gegl-gtk-marshal.c
 gen_headers = gegl-gtk-marshal.h
@@ -38,6 +39,8 @@ gegl-gtk-marshal.c: gegl-gtk-marshal.h
 	echo "#include \"gegl-gtk-marshal.h\"" >> gegl-gtk-marshal.c \
 	&& glib-genmarshal --prefix=gegl_gtk_marshal $(srcdir)/gegl-gtk-marshal.list --body >> gegl-gtk-marshal.c
 
+EXTRA_DIST += gegl-gtk-marshal.list
+
 ### GObject introspection
 -include $(INTROSPECTION_MAKEFILE)
 
@@ -76,9 +79,15 @@ gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.vapi: \
 
 vapidir=$(datadir)/vala/vapi
 vapi_DATA = \
-	gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.vapi
+	gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.vapi \
 	gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.deps
+
+CLEANFILES += gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.vapi
 
 endif # HAVE_VALA
 
 endif # HAVE_INTROSPECTION
+
+EXTRA_DIST += \
+	gegl-gtk2-@GEGL_GTK_API_VERSION@.deps \
+	gegl-gtk3-@GEGL_GTK_API_VERSION@.deps
