@@ -378,17 +378,17 @@ void view_helper_get_transformation(ViewHelper *self, GeglMatrix3 *matrix)
     matrix->coeff [2][1] = 0.0;
     matrix->coeff [2][2] = 1.0;
 #else
-    matrix [0][0] = self->scale;
-    matrix [0][1] = 0.0;
-    matrix [0][2] = -self->x;
+    (*matrix) [0][0] = self->scale;
+    (*matrix) [0][1] = 0.0;
+    (*matrix) [0][2] = -self->x;
 
-    matrix [1][0] = 0.0;
-    matrix [1][1] = self->scale;
-    matrix [1][2] = -self->y;
+    (*matrix) [1][0] = 0.0;
+    (*matrix) [1][1] = self->scale;
+    (*matrix) [1][2] = -self->y;
 
-    matrix [2][0] = 0.0;
-    matrix [2][1] = 0.0;
-    matrix [2][2] = 1.0;
+    (*matrix) [2][0] = 0.0;
+    (*matrix) [2][1] = 0.0;
+    (*matrix) [2][2] = 1.0;
 #endif
 
 }
