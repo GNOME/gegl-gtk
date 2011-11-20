@@ -14,6 +14,7 @@
  * License along with GEGL-GTK; if not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright (C) 2003, 2004, 2006 Øyvind Kolås <pippin@gimp.org>
+ * Copyright (C) 2011 Jon Nordby <jononor@gmail.com>
  */
 
 #ifndef __VIEW_HELPER_H__

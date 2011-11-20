@@ -14,6 +14,7 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright (C) 2003, 2004, 2006, 2008 Øyvind Kolås
+ * Copyright (C) 2011 Jon Nordby <jononor@gmail.com>
  */
 
 #include <string.h>
