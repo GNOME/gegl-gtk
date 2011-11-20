@@ -13,17 +13,18 @@ gegl_lt_ccld_v_0 = @echo "  CCLD   " $@;
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/gegl-gtk
 
-AM_CFLAGS = $(GEGL_CFLAGS) $(GTK_CFLAGS)
+CFLAGS = $(GTK_CFLAGS) $(GEGL_CFLAGS)
 
-AM_LDFLAGS =  \
-	$(top_builddir)/gegl-gtk/libgegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.la \
-	$(GEGL_LIBS) $(GTK_LIBS)
+libgeglgtk = $(top_builddir)/gegl-gtk/libgegl-gtk$(GEGL_GTK_GTK_VERSION)-$(GEGL_GTK_API_VERSION).la
+
+LIBS =  \
+	$(GTK_LIBS) $(GEGL_LIBS) $(libgeglgtk)
 
 all-local: $(bins)
 
 %: %.c $(GEGLHEADERS)
-	$(gegl_lt_cc_v) $(LIBTOOL) --quiet --mode=compile $(CC) $(DEFS) -I. -I$(top_builddir) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o $@.lo $< 
-	$(gegl_lt_ccld_v) $(LIBTOOL) --quiet --mode=link $(CC) $(AM_LDFLAGS) $(LDFLAGS) $(CFLAGS) -o $@ $@.lo $(LIBS)
+	$(gegl_lt_cc_v) $(LIBTOOL) --quiet --tag=CC --mode=compile $(CC) $(DEFS) -I. -I$(top_builddir) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o $@.lo $< 
+	$(gegl_lt_ccld_v) $(LIBTOOL) --quiet --tag=CC --mode=link $(CC) $(AM_LDFLAGS) $(LDFLAGS) $(CFLAGS) -o $@ $@.lo $(LIBS)
 
 clean-local:
 	rm -f *.lo $(bins)
