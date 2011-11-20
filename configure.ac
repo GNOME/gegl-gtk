@@ -13,7 +13,7 @@ dnl    set GEGL_GTK_BINARY_AGE _and_ GEGL_GTK_INTERFACE_AGE to 0.
 
 m4_define([gegl_gtk_major_version], [0])
 m4_define([gegl_gtk_minor_version], [0])
-m4_define([gegl_gtk_micro_version], [1])
+m4_define([gegl_gtk_micro_version], [7])
 m4_define([gegl_gtk_api_version], [0.1])
 
 m4_define([gegl_gtk_real_version],
