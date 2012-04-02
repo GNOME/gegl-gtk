@@ -63,7 +63,7 @@ static void
 teardown_widget_test(ViewWidgetTest *test)
 {
     g_object_unref(test->graph);
-    gegl_buffer_destroy(test->buffer);
+    g_object_unref(test->buffer);
     gtk_widget_destroy(test->window);
 }
 

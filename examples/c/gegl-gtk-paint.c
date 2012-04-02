@@ -133,7 +133,7 @@ static gboolean paint_release(GtkWidget      *widget,
         processor = gegl_node_new_processor(writebuf, &roi);
         while (gegl_processor_work(processor, NULL)) ;
 
-        gegl_processor_destroy(processor);
+        g_object_unref(processor);
         g_object_unref(writebuf);
 
         gegl_node_link_many(top, out, NULL);
@@ -241,7 +241,7 @@ main(gint    argc,
 
     gtk_main();
     g_object_unref(gegl);
-    gegl_buffer_destroy(buffer);
+    g_object_unref(buffer);
 
     gegl_exit();
     return 0;

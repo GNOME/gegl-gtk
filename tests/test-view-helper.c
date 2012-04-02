@@ -61,7 +61,7 @@ static void
 teardown_helper_test(ViewHelperTest *test)
 {
     g_object_unref(test->graph);
-    gegl_buffer_destroy(test->buffer);
+    g_object_unref(test->buffer);
     g_object_unref(test->helper);
 }
 
