@@ -8,20 +8,10 @@ SUBDIRS=\
 	examples \
 	tests
 
-pkgconfigdir = $(libdir)/pkgconfig
-
-if HAVE_GTK2
-pkgconfig_DATA = gegl-gtk2-0.1.pc
-else
-pkgconfig_DATA = gegl-gtk3-0.1.pc
-endif
-
 EXTRA_DIST = \
 	autogen.sh \
 	docs/reference/gegl-gtk-docs.xml.in \
 	docs/gtk-doc.make \
-	gegl-gtk2-0.1.pc.in \
-	gegl-gtk3-0.1.pc.in \
 	m4/introspection.m4
 
 DISTCHECK_CONFIGURE_FLAGS = --disable-introspection --enable-gtk-doc

@@ -1,3 +1,5 @@
+
+### Library
 CLEANFILES = 
 EXTRA_DIST =
 
@@ -40,6 +42,19 @@ gegl-gtk-marshal.c: gegl-gtk-marshal.h
 	&& glib-genmarshal --prefix=gegl_gtk_marshal $(srcdir)/gegl-gtk-marshal.list --body >> gegl-gtk-marshal.c
 
 EXTRA_DIST += gegl-gtk-marshal.list
+
+### pkg-config
+pkgconfigdir = $(libdir)/pkgconfig
+
+if HAVE_GTK2
+pkgconfig_DATA = gegl-gtk2-0.1.pc
+else
+pkgconfig_DATA = gegl-gtk3-0.1.pc
+endif
+
+EXTRA_DIST += \
+	gegl-gtk2.pc.in \
+	gegl-gtk3.pc.in
 
 ### GObject introspection
 -include $(INTROSPECTION_MAKEFILE)

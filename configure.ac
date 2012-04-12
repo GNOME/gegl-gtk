@@ -215,12 +215,6 @@ esac
 
 m4_define([gegl_gtk_gtk_version], [$GEGL_GTK_GTK_VERSION])
 
-# Files with versions in their names
-AC_CONFIG_FILES(
-gegl-gtk/GeglGtk\
-gegl_gtk_gtk_version-gegl_gtk_api_version.metadata:gegl-gtk/GeglGtk.metadata.in
-)
-
 AC_SUBST(GEGL_GTK_GTK_VERSION)
 
 AM_CONDITIONAL(HAVE_GTK2, test "$have_gtk" = "2.0")
@@ -341,6 +335,15 @@ if test -z "${MAINTAINER_MODE_TRUE}"; then
    GTK_CFLAGS="-DG_DISABLE_DEPRECATED -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED $GTK_CFLAGS"
 fi
 
+
+# Files with versions in their names
+AC_CONFIG_FILES(
+gegl-gtk/GeglGtk\
+gegl_gtk_gtk_version-gegl_gtk_api_version.metadata:gegl-gtk/GeglGtk.metadata.in
+gegl-gtk/gegl-gtk2-gegl_gtk_api_version.pc:gegl-gtk/gegl-gtk2.pc.in
+gegl-gtk/gegl-gtk3-gegl_gtk_api_version.pc:gegl-gtk/gegl-gtk3.pc.in
+)
+
 AC_OUTPUT([
 Makefile
 gegl-gtk/Makefile
@@ -351,8 +354,6 @@ examples/vala/Makefile
 tests/Makefile
 docs/reference/Makefile
 docs/reference/gegl-gtk-docs.xml
-gegl-gtk2-0.1.pc
-gegl-gtk3-0.1.pc
 ])
 
 dnl Print a summary of features enabled/disabled:
