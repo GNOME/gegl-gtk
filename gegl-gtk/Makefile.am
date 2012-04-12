@@ -73,11 +73,12 @@ if HAVE_VALA
 gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.vapi: \
 	GeglGtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.gir
 
-	$(VAPIGEN) --pkg gtk+-@GEGL_GTK_GTK_VERSION@.0 \
+	$(VAPIGEN) --pkg gtk+-@GEGL_GTK_GTK_VERSION@.0 --pkg Gegl-0.2 \
 	--library=gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@ \
+	--vapidir=@VAPIDIR@ --girdir=@GIRDIR@ \
 	GeglGtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.gir
 
-vapidir=$(datadir)/vala/vapi
+vapidir=@VAPIDIR@
 vapi_DATA = \
 	gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.vapi \
 	gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.deps

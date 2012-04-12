@@ -259,6 +259,11 @@ fi
 
 AM_CONDITIONAL(HAVE_INTROSPECTION, test "x$enable_introspection" = "xyes")
 
+if test "x$GIRDIR" = "x"; then
+  GIRDIR=$(datadir)/vala/vapi
+fi
+AC_SUBST([GIRDIR])
+
 ########################
 # Check Vala
 ########################
@@ -279,6 +284,13 @@ fi
 
 have_vala=$have_vapigen
 AM_CONDITIONAL(HAVE_VALA, test "$have_vala" = "yes")
+
+if test "x$VAPIDIR" = "x"; then
+  VAPIDIR=$(datadir)/vala/vapi
+fi
+AC_SUBST([VAPIDIR])
+
+# `$PKG_CONFIG --variable=vapidir $valapkg`
 
 ######################################
 # Checks for gtk-doc and docbook-tools
