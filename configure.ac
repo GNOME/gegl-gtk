@@ -184,7 +184,7 @@ PKG_CHECK_MODULES(BABL, babl >= babl_required_version)
 ######################################
 # Checks for GEGL
 ######################################
-PKG_CHECK_MODULES(GEGL, gegl >= gegl_required_version)
+PKG_CHECK_MODULES(GEGL, gegl-0.2 >= gegl_required_version)
 
 ######################################
 # Checks for required deps
