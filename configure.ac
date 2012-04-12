@@ -106,7 +106,7 @@ AC_SUBST(GTK3_REQUIRED_VERSION)
 PACKAGE_NAME=gegl-gtk
 AC_SUBST(PACKAGE_NAME)
 
-GEGL_PLUGINS_DIR=`pkg-config gegl --variable=pluginsdir`
+GEGL_PLUGINS_DIR=`pkg-config gegl-0.2 --variable=pluginsdir`
 if test -z $GEGL_PLUGINS_DIR; then
 	GEGL_PREFIX=`pkg-config gegl --variable=prefix`
 	GEGL_PLUGINS_DIR=$GEGL_PREFIX/lib/gegl-0.1
