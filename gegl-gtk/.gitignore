@@ -1,5 +1,6 @@
 *.gir
 *.typelib
 *.vapi
+*.metadata
 gegl-gtk-enums.c
 gegl-gtk-marshal.*

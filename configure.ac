@@ -213,6 +213,14 @@ case "$with_gtk" in
 	*) ;;
 esac
 
+m4_define([gegl_gtk_gtk_version], [$GEGL_GTK_GTK_VERSION])
+
+# Files with versions in their names
+AC_CONFIG_FILES(
+gegl-gtk/GeglGtk\
+gegl_gtk_gtk_version-gegl_gtk_api_version.metadata:gegl-gtk/GeglGtk.metadata.in
+)
+
 AC_SUBST(GEGL_GTK_GTK_VERSION)
 
 AM_CONDITIONAL(HAVE_GTK2, test "$have_gtk" = "2.0")
