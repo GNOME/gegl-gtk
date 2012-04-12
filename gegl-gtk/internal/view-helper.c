@@ -366,7 +366,7 @@ void view_helper_get_transformation(ViewHelper *self, GeglMatrix3 *matrix)
      * GeglMatrix3 changed from float[3][3] to
      * struct with a float[3][3] coeff member */
 
-#if GEGL_MINOR_VERSION == 1 && GEGL_MICRO_VERSION >= 7
+#if GEGL_MINOR_VERSION == 1 && GEGL_MICRO_VERSION >= 7 || GEGL_MINOR_VERSION >= 2
     matrix->coeff [0][0] = self->scale; /* xx */
     matrix->coeff [0][1] = 0.0; /* xy */
     matrix->coeff [0][2] = -self->x; /* x0 */
