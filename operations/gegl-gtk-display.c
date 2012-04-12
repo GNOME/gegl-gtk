@@ -145,13 +145,24 @@ gegl_chant_class_init(GeglChantClass *klass)
     G_OBJECT_CLASS(klass)->dispose = dispose;
 
 #ifdef HAVE_GTK2
-    operation_class->name        = "gegl-gtk2:display";
+#define OPERATION_NAME "gegl-gtk2:display"
 #else
-    operation_class->name        = "gegl-gtk3:display";
+#define OPERATION_NAME "gegl-gtk3:display"
 #endif
+
+#if GEGL_MINOR_VERSION >= 2 && GEGL_MICRO_VERSION >= 0
+    gegl_operation_class_set_keys (operation_class,
+        "name", OPERATION_NAME ,
+        "categories", "output",
+        "description", _("Displays the input buffer in an GTK window ."),
+        NULL);
+#else /* GEGL < 0.2.0 */
+    operation_class->name        = OPERATION_NAME;
     operation_class->categories  = "output";
     operation_class->description =
         _("Displays the input buffer in an GTK window .");
+#endif
+
 }
 
 #endif
