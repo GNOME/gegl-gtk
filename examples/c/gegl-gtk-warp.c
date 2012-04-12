@@ -195,8 +195,8 @@ main (gint    argc,
 
   gtk_main ();
   g_object_unref (graph);
-  gegl_buffer_destroy (original_buffer);
-  gegl_buffer_destroy (coords_buffer);
+  g_object_unref (original_buffer);
+  g_object_unref (coords_buffer);
 
   gegl_exit ();
   return 0;
