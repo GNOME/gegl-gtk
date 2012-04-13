@@ -1,2 +1,8 @@
 
-SUBDIRS = c vala
+SUBDIRS = c
+
+if HAVE_INTROSPECTION
+if HAVE_VALA
+SUBDIRS += vala
+endif # HAVE_VALA
+endif # HAVE_INTROSPECTION
