@@ -129,7 +129,6 @@ main(int argc, char **argv)
 
     int retval = -1;
 
-    g_thread_init(NULL);
     gegl_init(&argc, &argv);
     g_test_init(&argc, &argv, NULL);
 
