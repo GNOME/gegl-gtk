@@ -32,7 +32,6 @@ main(gint    argc,
     GeglNode *graph = NULL;
     GeglNode *node = NULL;
 
-    g_thread_init(NULL);
     gtk_init(&argc, &argv);
     gegl_init(&argc, &argv);
 

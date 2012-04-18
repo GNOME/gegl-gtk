@@ -176,7 +176,6 @@ gint
 main(gint    argc,
      gchar **argv)
 {
-    g_thread_init(NULL);
     gtk_init(&argc, &argv);
     gegl_init(&argc, &argv);
 

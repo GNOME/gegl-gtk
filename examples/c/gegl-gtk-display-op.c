@@ -29,7 +29,6 @@ main(gint    argc,
     GeglNode *node = NULL;
     GeglNode *display = NULL;
 
-    g_thread_init(NULL);
     gegl_init(&argc, &argv);
 
     if (argc != 2) {

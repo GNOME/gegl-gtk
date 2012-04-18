@@ -173,7 +173,6 @@ main (gint    argc,
       return 0;
     }
 
-  g_thread_init (NULL);
   gtk_init (&argc, &argv);
   gegl_init (&argc, &argv);
 
