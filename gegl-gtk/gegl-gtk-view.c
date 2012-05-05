@@ -351,6 +351,8 @@ trigger_redraw(ViewHelper *priv,
                GeglRectangle *rect,
                GeglGtkView *view)
 {
+    g_print("Triggering redraw: (%d,%d %dx%d)\n", rect->x, rect->y, rect->width, rect->height);
+
     if (rect->width < 0 || rect->height < 0)
         gtk_widget_queue_draw(GTK_WIDGET(view));
     else

@@ -34,8 +34,14 @@ enum {
 
 static guint view_helper_signals[N_SIGNALS] = { 0 };
 
+
 static void
 finalize(GObject *gobject);
+void
+trigger_processing(ViewHelper *self, GeglRectangle roi);
+void
+trigger_redraw(ViewHelper *self, GeglRectangle *redraw_rect);
+
 
 static void
 view_helper_class_init(ViewHelperClass *klass)
@@ -68,7 +74,6 @@ view_helper_class_init(ViewHelperClass *klass)
 static void
 view_helper_init(ViewHelper *self)
 {
-    GeglRectangle invalid_rect = {0, 0, -1, -1};
     GdkRectangle invalid_gdkrect = {0, 0, -1, -1};
 
     self->node        = NULL;
@@ -76,9 +81,12 @@ view_helper_init(ViewHelper *self)
     self->y           = 0;
     self->scale       = 1.0;
     self->autoscale_policy = GEGL_GTK_VIEW_AUTOSCALE_CONTENT;
+    self->block = FALSE;
 
     self->monitor_id  = 0;
-    self->processor   = NULL;
+    self->processor = NULL;
+    self->processing_queue = g_queue_new();
+    self->currently_processed_rect = NULL;
 
     self->widget_allocation = invalid_gdkrect;
 }
@@ -98,6 +106,8 @@ finalize(GObject *gobject)
 
     if (self->processor)
         g_object_unref(self->processor);
+
+    g_queue_free_full(self->processing_queue, g_free);
 }
 
 /* Transform a rectangle from model to view coordinates. */
@@ -148,21 +158,41 @@ invalidated_event(GeglNode      *node,
                   GeglRectangle *rect,
                   ViewHelper    *self)
 {
-    view_helper_repaint(self);
+    g_print("%s\n", __PRETTY_FUNCTION__);
+    trigger_processing(self, *rect);
 }
 
 static gboolean
 task_monitor(ViewHelper *self)
 {
-    if (self->processor == NULL)
+    if (!self->processor || !self->node) {
         return FALSE;
+    }
 
-    if (gegl_processor_work(self->processor, NULL))
-        return TRUE;
+    // PERFORMANCE: combine all the rects added to the queue during a single
+    // iteration of the main loop somehow
 
-    self->monitor_id = 0;
+    if (g_queue_is_empty(self->processing_queue)) {
+        // Unregister worker
+        self->monitor_id = 0;
+        return FALSE;
+    }
 
-    return FALSE;
+    if (self->currently_processed_rect) {
+        self->currently_processed_rect = (GeglRectangle *)g_queue_pop_tail(self->processing_queue);
+        gegl_processor_set_rectangle(self->processor, self->currently_processed_rect);
+    }
+
+    gboolean processing_done = !gegl_processor_work(self->processor, NULL);
+
+    if (processing_done) {
+        // Go to next region
+        g_free(self->currently_processed_rect);
+        self->currently_processed_rect = (GeglRectangle *)g_queue_pop_tail(self->processing_queue);
+        gegl_processor_set_rectangle(self->processor, self->currently_processed_rect);
+    }
+
+    return TRUE;
 }
 
 
@@ -178,12 +208,13 @@ computed_event(GeglNode      *node,
 {
     update_autoscale(self);
 
+    g_print("%s\n", __PRETTY_FUNCTION__);
+
     /* Emit redraw-needed */
     GeglRectangle redraw_rect = *rect;
     model_rect_to_view_rect(self, &redraw_rect);
 
-    g_signal_emit(self, view_helper_signals[SIGNAL_REDRAW_NEEDED],
-                  0, &redraw_rect, NULL);
+    trigger_redraw(self, &redraw_rect);
 }
 
 ViewHelper *
@@ -240,18 +271,23 @@ view_helper_set_allocation(ViewHelper *self, GdkRectangle *allocation)
 
 /* Trigger processing of the GeglNode */
 void
-view_helper_repaint(ViewHelper *self)
+trigger_processing(ViewHelper *self, GeglRectangle roi)
 {
-    GeglRectangle    roi;
+    //GeglRectangle    roi;
+
+    // PERFORMANCE: determine the area that the view widget is interested in,
+    // and calculate the intersection with the invalidated rect
+    // and only pass this value as the ROI
+    // Would then also have to follow changes in view transformation
 
     if (!self->node)
         return;
 
-    roi.x = self->x / self->scale;
-    roi.y = self->y / self->scale;
+//    roi.x = self->x / self->scale;
+//    roi.y = self->y / self->scale;
 
-    roi.width = ceil(self->widget_allocation.width / self->scale + 1);
-    roi.height = ceil(self->widget_allocation.height / self->scale + 1);
+//    roi.width = ceil(self->widget_allocation.width / self->scale + 1);
+//    roi.height = ceil(self->widget_allocation.height / self->scale + 1);
 
     if (self->monitor_id == 0) {
         self->monitor_id = g_idle_add_full(G_PRIORITY_LOW,
@@ -259,18 +295,24 @@ view_helper_repaint(ViewHelper *self)
                                            NULL);
     }
 
-    if (self->processor)
-        gegl_processor_set_rectangle(self->processor, &roi);
-    else
-        self->processor = gegl_node_new_processor(self->node, &roi);
+    // Add the invalidated region to the dirty
+    GeglRectangle *rect = g_new(GeglRectangle, 1);
+    g_queue_push_head(self->processing_queue, rect);
 }
 
 void
-invalidate(ViewHelper *self)
+trigger_redraw(ViewHelper *self, GeglRectangle *redraw_rect)
 {
-    GeglRectangle redraw_rect = {0, 0, -1, -1}; /* Indicates full redraw */
+    // FIXME: only redraw the exact area
+    // coordinates are currently not correct
+
+    //if (!redraw_rect) {
+        GeglRectangle invalid_rect = {0, 0, -1, -1}; /* Indicates full redraw */
+        redraw_rect = &invalid_rect;
+    //}
+
     g_signal_emit(self, view_helper_signals[SIGNAL_REDRAW_NEEDED],
-                  0, &redraw_rect, NULL);
+                  0, redraw_rect, NULL);
 }
 
 void
@@ -293,8 +335,14 @@ view_helper_set_node(ViewHelper *self, GeglNode *node)
                                 G_CALLBACK(invalidated_event),
                                 self, 0);
 
+        if (self->processor)
+            g_object_unref(self->processor);
+
+        GeglRectangle bbox = gegl_node_get_bounding_box(self->node);
+        self->processor = gegl_node_new_processor(self->node, &bbox);
+
         update_autoscale(self);
-        invalidate(self);
+        trigger_processing(self, bbox);
 
     } else
         self->node = NULL;
@@ -314,7 +362,7 @@ view_helper_set_scale(ViewHelper *self, float scale)
 
     self->scale = scale;
     update_autoscale(self);
-    invalidate(self);
+    trigger_redraw(self, NULL);
 }
 
 float
@@ -331,7 +379,7 @@ view_helper_set_x(ViewHelper *self, float x)
 
     self->x = x;
     update_autoscale(self);
-    invalidate(self);
+    trigger_redraw(self, NULL);
 }
 
 float
@@ -348,7 +396,7 @@ view_helper_set_y(ViewHelper *self, float y)
 
     self->y = y;
     update_autoscale(self);
-    invalidate(self);
+    trigger_redraw(self, NULL);
 }
 
 float

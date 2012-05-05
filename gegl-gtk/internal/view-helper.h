@@ -50,6 +50,9 @@ struct _ViewHelper {
 
     guint          monitor_id;
     GeglProcessor *processor;
+    GQueue        *processing_queue; /* Queue of rectangles that needs to be processed */
+    GeglRectangle *currently_processed_rect;
+
     GdkRectangle   widget_allocation; /* The allocated size of the widget */
 };
 
@@ -61,8 +64,7 @@ struct _ViewHelperClass {
 GType view_helper_get_type(void) G_GNUC_CONST;
 
 ViewHelper *view_helper_new(void);
-void view_helper_node_changed(ViewHelper *self);
-void view_helper_repaint(ViewHelper *self);
+
 void view_helper_draw(ViewHelper *self, cairo_t *cr, GdkRectangle *rect);
 void view_helper_set_allocation(ViewHelper *self, GdkRectangle *allocation);
 
