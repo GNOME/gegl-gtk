@@ -116,8 +116,8 @@ model_rect_to_view_rect(ViewHelper *self, GeglRectangle *rect)
 {
     GeglRectangle temp;
 
-    temp.x = self->scale * (rect->x) - rect->x;
-    temp.y = self->scale * (rect->y) - rect->y;
+    temp.x = self->scale * (rect->x) - self->x;
+    temp.y = self->scale * (rect->y) - self->y;
     temp.width = ceil(self->scale * rect->width);
     temp.height = ceil(self->scale * rect->height);
 
