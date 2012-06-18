@@ -108,6 +108,10 @@ finalize(GObject *gobject)
         g_object_unref(self->processor);
 
     g_queue_free_full(self->processing_queue, g_free);
+
+    if (self->currently_processed_rect) {
+        g_free(self->currently_processed_rect);
+    }
 }
 
 /* Transform a rectangle from model to view coordinates. */
@@ -171,24 +175,29 @@ task_monitor(ViewHelper *self)
     // PERFORMANCE: combine all the rects added to the queue during a single
     // iteration of the main loop somehow
 
-    if (g_queue_is_empty(self->processing_queue)) {
-        // Unregister worker
-        self->monitor_id = 0;
-        return FALSE;
-    }
+    if (!self->currently_processed_rect) {
 
-    if (self->currently_processed_rect) {
-        self->currently_processed_rect = (GeglRectangle *)g_queue_pop_tail(self->processing_queue);
-        gegl_processor_set_rectangle(self->processor, self->currently_processed_rect);
+        if (g_queue_is_empty(self->processing_queue)) {
+            // Unregister worker
+            self->monitor_id = 0;
+            return FALSE;
+        }
+        else {
+            // Fetch next rect to process
+            self->currently_processed_rect = (GeglRectangle *)g_queue_pop_tail(self->processing_queue);
+            g_assert(self->currently_processed_rect);
+            gegl_processor_set_rectangle(self->processor, self->currently_processed_rect);
+        }
     }
 
     gboolean processing_done = !gegl_processor_work(self->processor, NULL);
 
     if (processing_done) {
         // Go to next region
-        g_free(self->currently_processed_rect);
-        self->currently_processed_rect = (GeglRectangle *)g_queue_pop_tail(self->processing_queue);
-        gegl_processor_set_rectangle(self->processor, self->currently_processed_rect);
+        if (self->currently_processed_rect) {
+            g_free(self->currently_processed_rect);
+        }
+        self->currently_processed_rect = NULL;
     }
 
     return TRUE;
@@ -294,15 +303,16 @@ trigger_processing(ViewHelper *self, GeglRectangle roi)
 
     // Add the invalidated region to the dirty
     GeglRectangle *rect = g_new(GeglRectangle, 1);
+    rect->x = roi.x;
+    rect->y = roi.y;
+    rect->width = roi.width;
+    rect->height = roi.height;
     g_queue_push_head(self->processing_queue, rect);
 }
 
 void
 trigger_redraw(ViewHelper *self, GeglRectangle *redraw_rect)
 {
-    // FIXME: only redraw the exact area
-    // coordinates are currently not correct
-
     if (!redraw_rect) {
         GeglRectangle invalid_rect = {0, 0, -1, -1}; /* Indicates full redraw */
         redraw_rect = &invalid_rect;
