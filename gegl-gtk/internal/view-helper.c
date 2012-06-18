@@ -303,10 +303,10 @@ trigger_redraw(ViewHelper *self, GeglRectangle *redraw_rect)
     // FIXME: only redraw the exact area
     // coordinates are currently not correct
 
-    //if (!redraw_rect) {
+    if (!redraw_rect) {
         GeglRectangle invalid_rect = {0, 0, -1, -1}; /* Indicates full redraw */
         redraw_rect = &invalid_rect;
-    //}
+    }
 
     g_signal_emit(self, view_helper_signals[SIGNAL_REDRAW_NEEDED],
                   0, redraw_rect, NULL);
