@@ -22,18 +22,6 @@
 #include <gtk/gtk.h>
 #include <gegl-gtk.h>
 
-/* gegl */
-typedef enum
-{
-  GEGL_WARP_BEHAVIOR_MOVE,
-  GEGL_WARP_BEHAVIOR_GROW,
-  GEGL_WARP_BEHAVIOR_SHRINK,
-  GEGL_WARP_BEHAVIOR_SWIRL_CW,
-  GEGL_WARP_BEHAVIOR_SWIRL_CCW,
-  GEGL_WARP_BEHAVIOR_ERASE,
-  GEGL_WARP_BEHAVIOR_SMOOTH
-} GeglWarpBehavior;
-
 /* Tool */
 static gdouble         cursor_x; /* Hold the cursor x position */
 static gdouble         cursor_y; /* Hold the cursor y position */
