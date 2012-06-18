@@ -66,6 +66,45 @@ teardown_helper_test(ViewHelperTest *test)
 }
 
 
+static void
+computed_event(GeglNode      *node,
+               GeglRectangle *rect,
+               gpointer       data)
+{
+    gboolean *got_computed = (gboolean *)data;
+    *got_computed = TRUE;
+}
+
+/* Test that the GeglNode is processed when invalidated. */
+static void
+test_processing(void)
+{
+    ViewHelperTest test;
+    gboolean got_computed_event = FALSE;
+    GeglRectangle invalidated_rect = {0, 0, 128, 128};
+
+    setup_helper_test(&test);
+    /* Setup will invalidate the node, make sure those events are processed. */
+    while (gtk_events_pending()) {
+        gtk_main_iteration();
+    }
+    gegl_node_process(test.out);
+
+    g_signal_connect(test.out, "computed",
+                     G_CALLBACK(computed_event),
+                     &got_computed_event);
+
+    g_signal_emit_by_name(test.out, "invalidated", &invalidated_rect, NULL);
+
+    g_timeout_add(300, test_utils_quit_gtk_main, NULL);
+    gtk_main();
+
+    /* FIXME: test that the computed events span the invalidated area */
+    g_assert(got_computed_event);
+
+    teardown_helper_test(&test);
+}
+
 typedef struct {
     gboolean needs_redraw_called;
     GeglRectangle *expected_result;
@@ -132,6 +171,7 @@ main(int argc, char **argv)
     gegl_init(&argc, &argv);
     g_test_init(&argc, &argv, NULL);
 
+    g_test_add_func("/widgets/view/helper/processing", test_processing);
     g_test_add_func("/widgets/view/helper/redraw-on-computed", test_redraw_on_computed);
 
     retval = g_test_run();

@@ -83,48 +83,6 @@ test_sanity(void)
     teardown_widget_test(&test);
 }
 
-
-static void
-computed_event(GeglNode      *node,
-               GeglRectangle *rect,
-               gpointer       data)
-{
-    gboolean *got_computed = (gboolean *)data;
-    *got_computed = TRUE;
-}
-
-/* Test that the GeglNode is processed when invalidated. */
-static void
-test_processing(void)
-{
-    ViewWidgetTest test;
-    gboolean got_computed_event = FALSE;
-    GeglRectangle invalidated_rect = {0, 0, 128, 128};
-
-    setup_widget_test(&test);
-    /* Setup will invalidate the node, make sure those events are processed. */
-    while (gtk_events_pending()) {
-        gtk_main_iteration();
-    }
-    gegl_node_process(test.out);
-
-    g_signal_connect(test.out, "computed",
-                     G_CALLBACK(computed_event),
-                     &got_computed_event);
-
-    g_signal_emit_by_name(test.out, "invalidated", &invalidated_rect, NULL);
-
-    g_timeout_add(300, test_utils_quit_gtk_main, NULL);
-    gtk_main();
-
-    /* FIXME: test that the computed events span the invalidated area */
-    g_assert(got_computed_event);
-
-    teardown_widget_test(&test);
-}
-
-
-
 /* TODO:
  * - Test redraw with translation
  * - Test redraw with scaling
@@ -155,7 +113,6 @@ main(int argc, char **argv)
     g_test_init(&argc, &argv, NULL);
 
     g_test_add_func("/widgets/view/sanity", test_sanity);
-    g_test_add_func("/widgets/view/processing", test_processing);
 
     retval = g_test_run();
     gegl_exit();
