@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: GEGL-GTK
 Description: GTK+ UI convenience library for GEGL
 Version: @GEGL_GTK_REAL_VERSION@
-Requires: gtk+-3.0 gegl babl
+Requires: gtk+-3.0 gegl-0.2 babl
 Libs: -L${libdir} -l@PACKAGE_NAME@3-@GEGL_GTK_API_VERSION@
 Cflags: -I${includedir}/@PACKAGE_NAME@3-@GEGL_GTK_API_VERSION@
