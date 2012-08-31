@@ -241,6 +241,24 @@ AC_SUBST(CAIRO_GOBJECT_CFLAGS)
 AC_SUBST(CAIRO_GOBJECT_LIBS)
 
 ########################
+# Gdk Pixbuf
+########################
+PKG_CHECK_MODULES(GDKPIXBUF, glib-2.0 gmodule-2.0 gdk-pixbuf-2.0)
+
+# FIXME:
+# Ideally the pkg config file for gdk-pixbuf would have these paths set
+# There are also environment variables to take into account
+# For now, they are party hardcoded.
+AC_MSG_CHECKING(pixbufloader module directory)
+AC_SUBST(PIXBUFMODULEDIR, `pkg-config gdk-pixbuf-2.0 --variable=libdir`/gtk-2.0/2.10.0/loaders)
+AC_MSG_RESULT($PIXBUFMODULEDIR)
+
+AC_MSG_CHECKING(pixbufloader module file)
+#WRONG: target is x86_64-unknown-linux-gnu, should be x86_64-redhat-linux-gnu
+AC_SUBST(PIXBUFMODULEFILE, /etc/gtk-2.0/$target/gdk-pixbuf-loaders) 
+AC_MSG_RESULT($PIXBUFMODULEFILE)
+
+########################
 # Check GObject Introspection
 ########################
 AC_ARG_ENABLE([introspection],
@@ -348,6 +366,7 @@ AC_OUTPUT([
 Makefile
 gegl-gtk/Makefile
 operations/Makefile
+gdkpixbufloader/Makefile
 examples/Makefile
 examples/c/Makefile
 examples/vala/Makefile
