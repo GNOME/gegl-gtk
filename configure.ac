@@ -116,7 +116,7 @@ AC_SUBST(GEGL_PLUGINS_DIR)
 dnl ==========================================================================
 
 AM_INIT_AUTOMAKE(no-define no-dist-gzip foreign)
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS(config.h)
 
 GEGL_GTK_SERVER=www.gegl.org
 AC_SUBST(GEGL_GTK_SERVER)
