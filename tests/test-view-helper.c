@@ -94,7 +94,7 @@ test_processing(void)
                      G_CALLBACK(computed_event),
                      &got_computed_event);
 
-    g_signal_emit_by_name(test.out, "invalidated", &invalidated_rect, NULL);
+    gegl_node_invalidated(test.out, &invalidated_rect, FALSE);
 
     g_timeout_add(300, test_utils_quit_gtk_main, NULL);
     gtk_main();
