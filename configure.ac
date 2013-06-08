@@ -106,7 +106,7 @@ AC_SUBST(GTK3_REQUIRED_VERSION)
 PACKAGE_NAME=gegl-gtk
 AC_SUBST(PACKAGE_NAME)
 
-GEGL_PLUGINS_DIR=`pkg-config gegl-0.2 --variable=pluginsdir`
+GEGL_PLUGINS_DIR=`pkg-config gegl-0.3 --variable=pluginsdir`
 if test -z $GEGL_PLUGINS_DIR; then
 	GEGL_PREFIX=`pkg-config gegl --variable=prefix`
 	GEGL_PLUGINS_DIR=$GEGL_PREFIX/lib/gegl-0.1
@@ -184,7 +184,7 @@ PKG_CHECK_MODULES(BABL, babl >= babl_required_version)
 ######################################
 # Checks for GEGL
 ######################################
-PKG_CHECK_MODULES(GEGL, gegl-0.2 >= gegl_required_version)
+PKG_CHECK_MODULES(GEGL, gegl-0.3 >= gegl_required_version)
 
 ######################################
 # Checks for required deps
