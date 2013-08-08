@@ -36,7 +36,7 @@ m4_define([gegl_gtk_stable],
 
 # required versions of external libraries
 m4_define([babl_required_version], [0.1.4])
-m4_define([gegl_required_version], [0.1.6])
+m4_define([gegl_required_version], [0.3.0])
 m4_define([glib_required_version], [2.22.0])
 m4_define([gtk2_required_version], [2.18.0])
 m4_define([gtk3_required_version], [3.0.0])
@@ -109,7 +109,7 @@ AC_SUBST(PACKAGE_NAME)
 GEGL_PLUGINS_DIR=`pkg-config gegl-0.3 --variable=pluginsdir`
 if test -z $GEGL_PLUGINS_DIR; then
 	GEGL_PREFIX=`pkg-config gegl --variable=prefix`
-	GEGL_PLUGINS_DIR=$GEGL_PREFIX/lib/gegl-0.1
+	GEGL_PLUGINS_DIR=$GEGL_PREFIX/lib/gegl-0.3
 fi
 AC_SUBST(GEGL_PLUGINS_DIR)
 

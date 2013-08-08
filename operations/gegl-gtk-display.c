@@ -150,18 +150,11 @@ gegl_chant_class_init(GeglChantClass *klass)
 #define OPERATION_NAME "gegl-gtk3:display"
 #endif
 
-#if GEGL_MINOR_VERSION >= 2 && GEGL_MICRO_VERSION >= 0
     gegl_operation_class_set_keys (operation_class,
         "name", OPERATION_NAME ,
         "categories", "output",
-        "description", _("Displays the input buffer in an GTK window ."),
+        "description", _("Displays the input buffer in an GTK window."),
         NULL);
-#else /* GEGL < 0.2.0 */
-    operation_class->name        = OPERATION_NAME;
-    operation_class->categories  = "output";
-    operation_class->description =
-        _("Displays the input buffer in an GTK window .");
-#endif
 
 }
 
