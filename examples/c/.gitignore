@@ -1,2 +1,7 @@
-gegl-gtk-scroll
-gegl-gtk-transform
+/*.o
+/gegl-gtk-basic
+/gegl-gtk-display-op
+/gegl-gtk-paint
+/gegl-gtk-scroll
+/gegl-gtk-transform
+/gegl-gtk-warp

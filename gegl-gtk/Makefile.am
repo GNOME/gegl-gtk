@@ -10,7 +10,7 @@ BUILT_SOURCES = $(gen_headers)
 
 headers = gegl-gtk.h gegl-gtk-view.h gegl-gtk-enums.h
 sources = gegl-gtk-view.c $(gen_sources)
-INCLUDES = $(GTK_CFLAGS) $(GEGL_CFLAGS)
+AM_CFLAGS = $(GTK_CFLAGS) $(GEGL_CFLAGS)
 
 internal_headers = internal/view-helper.h
 internal_sources = internal/view-helper.c
@@ -22,7 +22,7 @@ lib_LTLIBRARIES = libgegl-gtk@GEGL_GTK_GTK_VERSION@-0.1.la
 
 libgegl_gtk@GEGL_GTK_GTK_VERSION@_0_1_la_SOURCES = $(headers)  $(gen_headers) $(sources) $(internal_headers) $(internal_sources)
 libgegl_gtk@GEGL_GTK_GTK_VERSION@_0_1_la_LIBADD = $(GTK_LIBS) $(GEGL_LIBS) $(CAIRO_GOBJECT_LIBS)
-libgegl_gtk@GEGL_GTK_GTK_VERSION@_0_1_la_CFLAGS = $(INCLUDES) $(CFLAGS)
+libgegl_gtk@GEGL_GTK_GTK_VERSION@_0_1_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS)
 libgegl_gtk@GEGL_GTK_GTK_VERSION@_0_1_la_LDFLAGS = $(gegl_gtk_LDFLAGS) -version-info $(GEGL_GTK_LIBRARY_VERSION)
 
 gegl-gtk-enums.c: $(srcdir)/gegl-gtk-enums.h
@@ -67,7 +67,7 @@ if HAVE_INTROSPECTION
 
 GeglGtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.gir: libgegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.la Makefile
 
-GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_CFLAGS = $(INCLUDES)
+GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_CFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS)
 GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_FILES = $(sources) $(headers)
 GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_LIBS = libgegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.la
 GeglGtk@GEGL_GTK_GTK_VERSION@_0_1_gir_INCLUDES = Gtk-@GEGL_GTK_GTK_VERSION@.0 Gegl-0.3
