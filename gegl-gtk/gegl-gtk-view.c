@@ -502,9 +502,9 @@ gegl_gtk_view_set_node(GeglGtkView *self, GeglNode *node)
 /**
  * gegl_gtk_view_get_node:
  * @self: A #GeglGtkView
- * Returns: (transfer none): The #GeglNode this widget displays
  *
  * Get the displayed #GeglNode
+ * Returns: (transfer none): The #GeglNode this widget displays
  **/
 GeglNode *
 gegl_gtk_view_get_node(GeglGtkView *self)
