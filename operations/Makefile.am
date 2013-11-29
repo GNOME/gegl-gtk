@@ -2,7 +2,7 @@ libgeglgtk = $(top_builddir)/gegl-gtk/libgegl-gtk$(GEGL_GTK_GTK_VERSION)-$(GEGL_
 
 ops =
 
-AM_LIBS = $(GTK_LIBS) $(GEGL_LIBS) $(libgeglgtk)
+LIBS = $(GTK_LIBS) $(GEGL_LIBS) $(libgeglgtk)
 AM_CPPFLAGS = -I. -I$(top_builddir) -I$(top_srcdir)/gegl-gtk -I$(srcdir)
 AM_CFLAGS = $(GTK_CFLAGS) $(GEGL_CFLAGS)
 AM_LDFLAGS = -avoid-version -export-dynamic -module
