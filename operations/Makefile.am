@@ -7,8 +7,8 @@ AM_CPPFLAGS = -I. -I$(top_builddir) -I$(top_srcdir)/gegl-gtk -I$(srcdir)
 AM_CFLAGS = $(GTK_CFLAGS) $(GEGL_CFLAGS)
 AM_LDFLAGS = -avoid-version -export-dynamic -module
 
-gegl_@GEGL_GTK_GTK_VERSION@_display_la_SOURCES = gegl-gtk-display.c
-ops += gegl-@GEGL_GTK_GTK_VERSION@-display.la
+gegl_gtk@GEGL_GTK_GTK_VERSION@_display_la_SOURCES = gegl-gtk-display.c
+ops += gegl-gtk@GEGL_GTK_GTK_VERSION@-display.la
 
 opdir = $(GEGL_PLUGINS_DIR)
 op_LTLIBRARIES = $(ops)
