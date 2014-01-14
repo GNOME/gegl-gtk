@@ -1,8 +1,8 @@
-
+#!/usr/bin/env python
 import sys, os.path
 
 import gi
-from gi.repository import Gegl, GeglGtk2, Gtk
+from gi.repository import Gegl, GeglGtk3, Gtk
 
 graph_xml = """
 <gegl>
@@ -26,13 +26,13 @@ if __name__ == '__main__':
 
     file_path = os.path.abspath(sys.argv[1])
 
-    Gegl.init(0,"")
+    Gegl.init([])
     node = Gegl.Node.new_from_xml(graph_xml % file_path, "/");
-    view_widget = GeglGtk2.View()
+    view_widget = GeglGtk3.View()
     view_widget.set_property('node', node.get_children()[-1])
 
     window = Gtk.Window()
+    window.connect("destroy", Gtk.main_quit)
     window.add(view_widget)
     window.show_all()
     Gtk.main()
-
