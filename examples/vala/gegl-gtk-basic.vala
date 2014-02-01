@@ -3,7 +3,7 @@ class Examples.Basic : GLib.Object {
 
     public static int main(string[] args) {
         Gtk.init(ref args);
-        Gegl.init(0, "");
+        Gegl.init(ref args);
 
         var graph = new Gegl.Node();
         var node = graph.create_child("gegl:load");
