@@ -489,7 +489,7 @@ gegl_gtk_view_new_for_node(GeglNode *node)
 /**
  * gegl_gtk_view_set_node:
  * @self: A #GeglGtkView
- * @node: (transfer full)(allow-none): a #GeglNode instance or %NULL
+ * @node: (transfer none)(allow-none): a #GeglNode instance or %NULL
  *
  * Change the #GeglNode to display
  **/
