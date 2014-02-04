@@ -254,7 +254,7 @@ fi
 AM_CONDITIONAL(HAVE_INTROSPECTION, test "x$enable_introspection" = "xyes")
 
 if test "x$GIRDIR" = "x"; then
-  GIRDIR=$(datadir)/vala/vapi
+  GIRDIR="\$(datadir)/gir-1.0"
 fi
 AC_SUBST([GIRDIR])
 
@@ -280,7 +280,7 @@ have_vala=$have_vapigen
 AM_CONDITIONAL(HAVE_VALA, test "$have_vala" = "yes")
 
 if test "x$VAPIDIR" = "x"; then
-  VAPIDIR=$(datadir)/vala/vapi
+  VAPIDIR="\$(datadir)/vala/vapi"
 fi
 AC_SUBST([VAPIDIR])
 
