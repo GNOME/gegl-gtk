@@ -54,6 +54,9 @@ struct _ViewHelper {
     GeglRectangle *currently_processed_rect;
 
     GdkRectangle   widget_allocation; /* The allocated size of the widget */
+
+    gulong computed_id;
+    gulong invalidated_id;
 };
 
 struct _ViewHelperClass {
