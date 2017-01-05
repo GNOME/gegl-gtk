@@ -21,18 +21,20 @@
 #include <glib/gi18n-lib.h>
 
 
-#ifdef GEGL_CHANT_PROPERTIES
+#ifdef GEGL_PROPERTIES
 
-gegl_chant_string(window_title, _("Window Title"), "",
-                  _("Title to give window, if no title given inherits name of the pad providing input."))
+property_string (window_title, _("Window Title"), "")
+  description (_("Title to give window, if no title given inherits name of the pad providing input."))
 
 #else
 
-#define GEGL_CHANT_TYPE_SINK
-#define GEGL_CHANT_C_FILE       "gegl-gtk-display.c"
+#define GEGL_OP_NO_SOURCE
+#define GEGL_OP_SINK
+#define GEGL_OP_NAME            gegl_gtk_display
+#define GEGL_OP_C_SOURCE        gegl-gtk-display.c
 
 #include <gegl.h>
-#include <gegl-chant.h>
+#include <gegl-op.h>
 
 #include <gtk/gtk.h>
 #include <gegl-gtk.h>
@@ -49,11 +51,11 @@ typedef struct {
 static Priv *
 init_priv(GeglOperation *operation)
 {
-    GeglChantO *o = GEGL_CHANT_PROPERTIES(operation);
+    GeglProperties *o = GEGL_PROPERTIES(operation);
 
-    if (!o->chant_data) {
+    if (!o->user_data) {
         Priv *priv = g_new0(Priv, 1);
-        o->chant_data = (void *) priv;
+        o->user_data = (void *) priv;
 
         gtk_init(0, 0);
 
@@ -70,13 +72,13 @@ init_priv(GeglOperation *operation)
 
         gtk_widget_show_all(priv->window);
     }
-    return (Priv *)(o->chant_data);
+    return (Priv *)(o->user_data);
 }
 
 static void
 set_window_attributes(GeglOperation *operation, const GeglRectangle *result)
 {
-    GeglChantO *o = GEGL_CHANT_PROPERTIES(operation);
+    GeglProperties *o = GEGL_PROPERTIES(operation);
     Priv       *priv = init_priv(operation);
 
     if (priv->width != result->width  ||
@@ -122,13 +124,13 @@ attach(GeglOperation *operation)
 static void
 dispose(GObject *object)
 {
-    GeglChantO *o = GEGL_CHANT_PROPERTIES(object);
-    Priv       *priv = (Priv *)o->chant_data;
+    GeglProperties *o = GEGL_PROPERTIES(object);
+    Priv       *priv = (Priv *)o->user_data;
 
     if (priv) {
         gtk_widget_destroy(priv->window);
         g_free(priv);
-        o->chant_data = NULL;
+        o->user_data = NULL;
     }
 
     G_OBJECT_CLASS(g_type_class_peek_parent(G_OBJECT_GET_CLASS(object)))->dispose(object);
@@ -136,7 +138,7 @@ dispose(GObject *object)
 
 
 static void
-gegl_chant_class_init(GeglChantClass *klass)
+gegl_op_class_init(GeglOpClass *klass)
 {
     GeglOperationClass     *operation_class = GEGL_OPERATION_CLASS(klass);
     GeglOperationSinkClass *sink_class = GEGL_OPERATION_SINK_CLASS(klass);
