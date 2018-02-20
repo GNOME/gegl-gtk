@@ -226,7 +226,7 @@ AC_SUBST(GTK_LIBS)
 ##################
 # Cairo gobject
 ###################
-AC_ARG_WITH(cairo-gobject, [  --without-cairo-gobject    build without Cairo GObject support])
+AC_ARG_WITH(cairo-gobject, [  --without-cairo-gobject build without Cairo GObject support])
 
 have_cairo_gobject="no"
 if test "x$with_cairo_gobject" != "xno"; then
@@ -244,7 +244,7 @@ AC_SUBST(CAIRO_GOBJECT_LIBS)
 # Check GObject Introspection
 ########################
 AC_ARG_ENABLE([introspection],
-              [  --disable-introspection        disable GObject introspection support (default=no)],,
+              [  --disable-introspection disable GObject introspection support (default=no)],,
               enable_introspection="yes")
 
 if test "x$enable_introspection" = "xyes"; then
@@ -262,10 +262,10 @@ AC_SUBST([GIRDIR])
 # Check Vala
 ########################
 
-AC_ARG_WITH(vala, [  --without-vala         build without Vala support])
+AC_ARG_WITH(vala, [  --enable-vala           build with Vala support])
 
 have_vapigen="no"
-if test "x$with_vala" != "xno"; then
+if test "x$enable_vala" == "xyes"; then
 
   AC_PATH_PROG(VAPIGEN, vapigen, no)
   if test "$VAPIGEN" = "no"; then
