@@ -465,8 +465,11 @@ gegl_gtk_view_new()
 GeglGtkView *
 gegl_gtk_view_new_for_buffer(GeglBuffer *buffer)
 {
-    GeglNode *node = gegl_node("gegl:buffer-source",
-                     "buffer", buffer, NULL);
+    GeglNode *node = g_object_new (GEGL_TYPE_NODE, NULL);
+    gegl_node_set (node,
+                   "operation", "gegl:buffer-source",
+                   "buffer", buffer,
+                   NULL);
     return gegl_gtk_view_new_for_node(node);
 }
 
