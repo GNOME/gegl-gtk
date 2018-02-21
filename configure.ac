@@ -262,11 +262,12 @@ AC_SUBST([GIRDIR])
 # Check Vala
 ########################
 
-AC_ARG_WITH(vala, [  --enable-vala           build with Vala support])
+AC_ARG_WITH(vala, [  --without-vala          build with Vala support])
 
 have_vapigen="no"
-if test "x$enable_vala" == "xyes"; then
+if test "x$enable_vala" != "xno"; then
 
+  AM_PROG_VALAC([0.34.0])
   AC_PATH_PROG(VAPIGEN, vapigen, no)
   if test "$VAPIGEN" = "no"; then
     have_vapigen="no  (vapigen executable not found)"

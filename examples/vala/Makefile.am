@@ -1,19 +1,25 @@
 
 if HAVE_VALA
 
-VALA_FILES = $(wildcard $(srcdir)/*.vala)
-EXTRA_DIST = $(VALA_FILES)
-bins   = $(subst $(srcdir)/,,$(VALA_FILES:.vala=))
+bin_PROGRAMS = gegl-gtk-basic
 
-vapi_dir = ../../gegl-gtk
-vala_pkg = gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@
+gegl_gtk_basic_CFLAGS = \
+	$(GEGL_CFLAGS) \
+	$(GTK_CFLAGS) \
+	-I$(top_builddir)/gegl-gtk \
+	-I$(top_srcdir)/gegl-gtk
 
-all-local: $(bins)
+gegl_gtk_basic_LDFLAGS = \
+	$(GEGL_LIBS) \
+	$(GTK_LIBS) \
+	$(top_builddir)/gegl-gtk/libgegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@.la
 
-gegl-gtk-basic: gegl-gtk-basic.vala $(vapi_dir)/$(vala_pkg).vapi
-	valac --pkg $(vala_pkg) --vapidir=@VAPIDIR@ --vapidir=$(vapi_dir) -o $@ $< 
+gegl_gtk_basic_SOURCES = \
+	gegl-gtk-basic.vala
 
-clean-local:
-	rm -f $(bins)
+gegl_gtk_basic_VALAFLAGS = \
+	--vapidir=$(top_builddir)/gegl-gtk \
+	--vapidir=$(top_srcdir)/gegl-gtk \
+	--pkg gegl-gtk@GEGL_GTK_GTK_VERSION@-@GEGL_GTK_API_VERSION@
 
 endif # HAVE_VALA
