@@ -36,7 +36,7 @@ m4_define([gegl_gtk_stable],
 
 # required versions of external libraries
 m4_define([babl_required_version], [0.1.4])
-m4_define([gegl_required_version], [0.3.0])
+m4_define([gegl_required_version], [0.4.0])
 m4_define([glib_required_version], [2.22.0])
 m4_define([gtk2_required_version], [2.18.0])
 m4_define([gtk3_required_version], [3.0.0])
@@ -106,10 +106,10 @@ AC_SUBST(GTK3_REQUIRED_VERSION)
 PACKAGE_NAME=gegl-gtk
 AC_SUBST(PACKAGE_NAME)
 
-GEGL_PLUGINS_DIR=`pkg-config gegl-0.3 --variable=pluginsdir`
+GEGL_PLUGINS_DIR=`pkg-config gegl-0.4 --variable=pluginsdir`
 if test -z $GEGL_PLUGINS_DIR; then
 	GEGL_PREFIX=`pkg-config gegl --variable=prefix`
-	GEGL_PLUGINS_DIR=$GEGL_PREFIX/lib/gegl-0.3
+	GEGL_PLUGINS_DIR=$GEGL_PREFIX/lib/gegl-0.4
 fi
 AC_SUBST(GEGL_PLUGINS_DIR)
 
@@ -184,7 +184,7 @@ PKG_CHECK_MODULES(BABL, babl >= babl_required_version)
 ######################################
 # Checks for GEGL
 ######################################
-PKG_CHECK_MODULES(GEGL, gegl-0.3 >= gegl_required_version)
+PKG_CHECK_MODULES(GEGL, gegl-0.4 >= gegl_required_version)
 
 ######################################
 # Checks for required deps
